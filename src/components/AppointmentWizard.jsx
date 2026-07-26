@@ -1,0 +1,470 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  X, 
+  Calendar, 
+  Clock, 
+  User, 
+  CheckCircle2, 
+  QrCode, 
+  ArrowRight, 
+  ArrowLeft, 
+  Sparkles, 
+  ShieldCheck,
+  Building2,
+  Stethoscope,
+  Phone,
+  Mail,
+  Printer
+} from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { departmentsData, doctorsData, translations } from '../data/mockData';
+
+export default function AppointmentWizard({ 
+  lang, 
+  isOpen, 
+  onClose, 
+  preSelectedDoctor, 
+  preSelectedDept 
+}) {
+  const t = translations[lang];
+
+  const [step, setStep] = useState(1);
+  const [selectedDeptId, setSelectedDeptId] = useState(preSelectedDept || 'cardiology');
+  const [selectedDoctorId, setSelectedDoctorId] = useState(preSelectedDoctor?.id || '');
+  const [selectedDate, setSelectedDate] = useState('2026-07-27');
+  const [selectedSlot, setSelectedSlot] = useState('10:00');
+  
+  const [patientForm, setPatientForm] = useState({
+    name: 'Deniz Kaya',
+    tcNo: '10984726514',
+    phone: '0532 987 65 43',
+    email: 'deniz.kaya@example.com',
+    notes: 'Rutin kontrol ve tahlil incelemesi.'
+  });
+
+  const [ticketData, setTicketData] = useState(null);
+
+  // Sync state if pre-selected doctor or department changes
+  useEffect(() => {
+    if (preSelectedDoctor) {
+      setSelectedDoctorId(preSelectedDoctor.id);
+      setSelectedDeptId(preSelectedDoctor.departmentId);
+      setStep(3); // Jump to date/time step if doctor is already chosen!
+    } else if (preSelectedDept) {
+      setSelectedDeptId(preSelectedDept);
+    }
+  }, [preSelectedDoctor, preSelectedDept]);
+
+  if (!isOpen) return null;
+
+  const currentDeptDoctors = doctorsData.filter(doc => doc.departmentId === selectedDeptId);
+  const selectedDoctorObj = doctorsData.find(doc => doc.id === selectedDoctorId) || currentDeptDoctors[0];
+  const selectedDeptObj = departmentsData.find(d => d.id === selectedDeptId);
+
+  const handleConfirmBooking = () => {
+    const randomTicketNo = 'LM-' + Math.floor(100000 + Math.random() * 900000);
+    const resultTicket = {
+      ticketNo: randomTicketNo,
+      patientName: patientForm.name,
+      tcNo: patientForm.tcNo,
+      phone: patientForm.phone,
+      doctor: selectedDoctorObj,
+      department: selectedDeptObj,
+      date: selectedDate,
+      time: selectedSlot,
+      createdAt: new Date().toLocaleString()
+    };
+
+    setTicketData(resultTicket);
+    setStep(5);
+
+    // Fire Confetti Celebration
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  };
+
+  const handleReset = () => {
+    setStep(1);
+    setTicketData(null);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+      <div className="glass-card max-w-2xl w-full p-6 md:p-8 border border-cyan-500/30 relative animate-fadeIn">
+        
+        {/* Close Button */}
+        <button 
+          onClick={handleReset}
+          className="absolute top-4 right-4 p-2 rounded-full bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        {/* Wizard Header */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1">
+            <Sparkles className="w-4 h-4" />
+            <span>LuminaCare Dijital Geçiş Sihirbazı</span>
+          </div>
+          <h2 className="text-2xl font-extrabold text-white">Online Randevu Oluştur</h2>
+        </div>
+
+        {/* Step Indicator Bar (Steps 1-4) */}
+        {step < 5 && (
+          <div className="grid grid-cols-4 gap-2 mb-8 border-b border-slate-800 pb-4">
+            <div className={`text-center pb-2 border-b-2 font-semibold text-xs ${step >= 1 ? 'border-cyan-400 text-cyan-400' : 'border-slate-800 text-slate-500'}`}>
+              1. Poliklinik
+            </div>
+            <div className={`text-center pb-2 border-b-2 font-semibold text-xs ${step >= 2 ? 'border-cyan-400 text-cyan-400' : 'border-slate-800 text-slate-500'}`}>
+              2. Uzman Hekim
+            </div>
+            <div className={`text-center pb-2 border-b-2 font-semibold text-xs ${step >= 3 ? 'border-cyan-400 text-cyan-400' : 'border-slate-800 text-slate-500'}`}>
+              3. Tarih & Saat
+            </div>
+            <div className={`text-center pb-2 border-b-2 font-semibold text-xs ${step >= 4 ? 'border-cyan-400 text-cyan-400' : 'border-slate-800 text-slate-500'}`}>
+              4. Onay
+            </div>
+          </div>
+        )}
+
+        {/* STEP 1: Select Polyclinic */}
+        {step === 1 && (
+          <div className="space-y-4 animate-fadeIn">
+            <h3 className="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-cyan-400" />
+              Lütfen Muayene Olmak İstediğiniz Tıbbi Birimi Seçin:
+            </h3>
+
+            <div className="grid sm:grid-cols-2 gap-3">
+              {departmentsData.map((dept) => (
+                <div
+                  key={dept.id}
+                  onClick={() => {
+                    setSelectedDeptId(dept.id);
+                    // Reset doctor selection to first of this department
+                    const firstDoc = doctorsData.find(d => d.departmentId === dept.id);
+                    if (firstDoc) setSelectedDoctorId(firstDoc.id);
+                  }}
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                    selectedDeptId === dept.id
+                      ? 'bg-cyan-950/60 border-cyan-500 shadow-lg shadow-cyan-500/20 text-white'
+                      : 'bg-slate-900/80 border-slate-800 hover:border-slate-700 text-slate-300'
+                  }`}
+                >
+                  <div>
+                    <h4 className="font-bold text-sm">{dept.title[lang]}</h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">{dept.specsCount} Kadrolu Hekim</p>
+                  </div>
+                  {selectedDeptId === dept.id && (
+                    <CheckCircle2 className="w-5 h-5 text-cyan-400" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end pt-4">
+              <button
+                onClick={() => setStep(2)}
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-md flex items-center gap-2"
+              >
+                <span>Hekim Seçimine Geç</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 2: Select Specialist Doctor */}
+        {step === 2 && (
+          <div className="space-y-4 animate-fadeIn">
+            <h3 className="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
+              <Stethoscope className="w-4 h-4 text-emerald-400" />
+              {selectedDeptObj?.title[lang]} - Nöbetçi Uzman Hekim Seçimi:
+            </h3>
+
+            <div className="space-y-3">
+              {currentDeptDoctors.map((doc) => (
+                <div
+                  key={doc.id}
+                  onClick={() => setSelectedDoctorId(doc.id)}
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between gap-4 ${
+                    selectedDoctorId === doc.id
+                      ? 'bg-emerald-950/60 border-emerald-500 shadow-lg shadow-emerald-500/20 text-white'
+                      : 'bg-slate-900/80 border-slate-800 hover:border-slate-700 text-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <img src={doc.image} alt={doc.name} className="w-12 h-12 rounded-xl object-cover border border-slate-700" />
+                    <div>
+                      <h4 className="font-bold text-sm text-white">{doc.name}</h4>
+                      <p className="text-xs text-cyan-400 font-medium">{doc.title[lang]}</p>
+                      <p className="text-[11px] text-slate-400">{doc.experience} Yıl Deneyim • ⭐ {doc.rating}</p>
+                    </div>
+                  </div>
+
+                  {selectedDoctorId === doc.id && (
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-between pt-4">
+              <button
+                onClick={() => setStep(1)}
+                className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs flex items-center gap-1.5"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Geri</span>
+              </button>
+
+              <button
+                onClick={() => setStep(3)}
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-400 hover:to-cyan-500 text-white font-bold text-xs shadow-md flex items-center gap-2"
+              >
+                <span>Tarih & Saat Seç</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3: Pick Date & Time Slot */}
+        {step === 3 && (
+          <div className="space-y-5 animate-fadeIn">
+            <div>
+              <h3 className="text-sm font-bold text-slate-200 mb-2 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-cyan-400" />
+                Randevu Tarihi Seçin:
+              </h3>
+              <div className="grid grid-cols-3 gap-3">
+                {['2026-07-27', '2026-07-28', '2026-07-29'].map((dateStr) => (
+                  <button
+                    key={dateStr}
+                    onClick={() => setSelectedDate(dateStr)}
+                    className={`py-3 rounded-xl text-xs font-bold border transition-all ${
+                      selectedDate === dateStr
+                        ? 'bg-cyan-500 text-slate-950 border-cyan-400 font-extrabold shadow-md'
+                        : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+                    }`}
+                  >
+                    {dateStr}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-bold text-slate-200 mb-2 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-amber-400" />
+                Uygun Saat Dilimi Seçin:
+              </h3>
+              <div className="grid grid-cols-4 gap-2">
+                {(selectedDoctorObj?.availableSlots || ["09:30", "11:00", "14:15", "16:00"]).map((slot) => (
+                  <button
+                    key={slot}
+                    onClick={() => setSelectedSlot(slot)}
+                    className={`py-2.5 rounded-lg text-xs font-bold border transition-all ${
+                      selectedSlot === slot
+                        ? 'bg-amber-400 text-slate-950 border-amber-300 font-extrabold shadow-md'
+                        : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-between pt-4">
+              <button
+                onClick={() => setStep(2)}
+                className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs flex items-center gap-1.5"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Geri</span>
+              </button>
+
+              <button
+                onClick={() => setStep(4)}
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-md flex items-center gap-2"
+              >
+                <span>Hasta Bilgilerine Geç</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 4: Patient Info & Confirmation */}
+        {step === 4 && (
+          <div className="space-y-4 animate-fadeIn">
+            <h3 className="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
+              <User className="w-4 h-4 text-cyan-400" />
+              Hasta Kimlik ve İletişim Bilgileri:
+            </h3>
+
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <label className="block text-slate-400 mb-1">Ad Soyad</label>
+                <input 
+                  type="text" 
+                  value={patientForm.name} 
+                  onChange={(e) => setPatientForm({...patientForm, name: e.target.value})}
+                  className="w-full p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1">T.C. Kimlik No</label>
+                <input 
+                  type="text" 
+                  value={patientForm.tcNo} 
+                  onChange={(e) => setPatientForm({...patientForm, tcNo: e.target.value})}
+                  className="w-full p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1">Telefon</label>
+                <input 
+                  type="text" 
+                  value={patientForm.phone} 
+                  onChange={(e) => setPatientForm({...patientForm, phone: e.target.value})}
+                  className="w-full p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1">E-Posta</label>
+                <input 
+                  type="email" 
+                  value={patientForm.email} 
+                  onChange={(e) => setPatientForm({...patientForm, email: e.target.value})}
+                  className="w-full p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+            </div>
+
+            {/* Summary Box */}
+            <div className="p-4 rounded-xl bg-slate-900/90 border border-cyan-500/30 text-xs text-slate-300 space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Seçilen Hekim:</span>
+                <strong className="text-white">{selectedDoctorObj?.name}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Poliklinik:</span>
+                <strong className="text-cyan-400">{selectedDeptObj?.title[lang]}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Tarih & Saat:</span>
+                <strong className="text-amber-400">{selectedDate} - {selectedSlot}</strong>
+              </div>
+            </div>
+
+            <div className="flex justify-between pt-4">
+              <button
+                onClick={() => setStep(3)}
+                className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs flex items-center gap-1.5"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Geri</span>
+              </button>
+
+              <button
+                onClick={handleConfirmBooking}
+                className="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-600 hover:from-emerald-400 hover:to-blue-500 text-white font-extrabold text-xs shadow-xl shadow-emerald-500/20"
+              >
+                Randevuyu Onayla ve Bilet Oluştur
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 5: Digital Pass Ticket & QR Code Screen */}
+        {step === 5 && ticketData && (
+          <div className="space-y-6 text-center animate-fadeIn">
+            
+            <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/20">
+              <CheckCircle2 className="w-10 h-10" />
+            </div>
+
+            <div>
+              <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                SMS & E-Posta Bilgilendirmesi Gönderildi
+              </span>
+              <h3 className="text-2xl font-extrabold text-white mt-2">Randevunuz Başarıyla Oluşturuldu!</h3>
+            </div>
+
+            {/* Dynamic Pass Card */}
+            <div className="glass-card p-6 border-cyan-500/40 text-left bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950/40 relative overflow-hidden shadow-2xl">
+              
+              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-cyan-400" />
+                  <span className="font-extrabold text-white text-sm">LuminaCare Dijital Geçiş Biletiniz</span>
+                </div>
+                <span className="font-mono font-bold text-amber-400 text-xs px-2 py-0.5 bg-amber-400/10 rounded border border-amber-400/30">
+                  {ticketData.ticketNo}
+                </span>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-4 my-4">
+                <div className="md:col-span-2 space-y-2 text-xs">
+                  <div>
+                    <span className="text-slate-500 block">Hasta Adı</span>
+                    <strong className="text-white text-sm">{ticketData.patientName}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">Poliklinik & Hekim</span>
+                    <strong className="text-cyan-400 text-xs block">{ticketData.department?.title[lang]}</strong>
+                    <strong className="text-slate-200 text-xs">{ticketData.doctor?.name}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">Randevu Zamanı</span>
+                    <strong className="text-amber-400 text-sm">{ticketData.date} @ {ticketData.time}</strong>
+                  </div>
+                </div>
+
+                {/* QR Code Mockup */}
+                <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-white text-slate-950 text-center shadow-inner">
+                  <QrCode className="w-24 h-24 text-slate-950" />
+                  <span className="text-[10px] font-mono font-bold mt-1">GİRİŞ QR KODU</span>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex justify-between">
+                <span>Oluşturulma: {ticketData.createdAt}</span>
+                <span className="text-emerald-400 font-semibold">Gelişinizde QR Kodu Turnikeye Okutunuz</span>
+              </div>
+
+            </div>
+
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => window.print()}
+                className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 font-semibold text-xs flex items-center gap-1.5 border border-slate-700"
+              >
+                <Printer className="w-4 h-4 text-cyan-400" />
+                <span>Bileti Yazdır</span>
+              </button>
+
+              <button
+                onClick={handleReset}
+                className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg"
+              >
+                Tamam
+              </button>
+            </div>
+
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
