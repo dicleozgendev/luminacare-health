@@ -19,6 +19,10 @@ import {
 import confetti from 'canvas-confetti';
 import { departmentsData, doctorsData, translations } from '../data/mockData';
 
+// Points at the local backend by default; override with VITE_API_BASE for
+// a deployed environment (e.g. when the API isn't on localhost:4100).
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4100';
+
 export default function AppointmentWizard({ 
   lang, 
   isOpen, 
@@ -36,11 +40,13 @@ export default function AppointmentWizard({
   
   const [patientForm, setPatientForm] = useState({
     name: 'Deniz Kaya',
-    tcNo: '10984726514',
     phone: '0532 987 65 43',
     email: 'deniz.kaya@example.com',
     notes: 'Rutin kontrol ve tahlil incelemesi.'
   });
+  const [consentGiven, setConsentGiven] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const [ticketData, setTicketData] = useState(null);
 
@@ -61,29 +67,69 @@ export default function AppointmentWizard({
   const selectedDoctorObj = doctorsData.find(doc => doc.id === selectedDoctorId) || currentDeptDoctors[0];
   const selectedDeptObj = departmentsData.find(d => d.id === selectedDeptId);
 
-  const handleConfirmBooking = () => {
-    const randomTicketNo = 'LM-' + Math.floor(100000 + Math.random() * 900000);
-    const resultTicket = {
-      ticketNo: randomTicketNo,
-      patientName: patientForm.name,
-      tcNo: patientForm.tcNo,
-      phone: patientForm.phone,
-      doctor: selectedDoctorObj,
-      department: selectedDeptObj,
-      date: selectedDate,
-      time: selectedSlot,
-      createdAt: new Date().toLocaleString()
-    };
+  const handleConfirmBooking = async () => {
+    if (!consentGiven) {
+      setSubmitError(lang === 'tr'
+        ? 'Devam etmek için açık rıza metnini onaylamanız gerekiyor.'
+        : 'You need to accept the consent notice to continue.');
+      return;
+    }
 
-    setTicketData(resultTicket);
-    setStep(5);
+    setIsSubmitting(true);
+    setSubmitError('');
 
-    // Fire Confetti Celebration
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
+    try {
+      const res = await fetch(`${API_BASE}/api/appointments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patientName: patientForm.name,
+          phone: patientForm.phone,
+          email: patientForm.email,
+          notes: patientForm.notes,
+          departmentId: selectedDeptObj?.id || selectedDeptId,
+          doctorId: selectedDoctorObj?.id || selectedDoctorId,
+          date: selectedDate,
+          time: selectedSlot,
+          consentGiven,
+        }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Booking failed (HTTP ${res.status})`);
+      }
+
+      const data = await res.json();
+
+      setTicketData({
+        ticketNo: data.ticketNo,
+        qrDataUrl: data.qrDataUrl,
+        emailSent: data.emailSent,
+        patientName: patientForm.name,
+        phone: patientForm.phone,
+        doctor: selectedDoctorObj,
+        department: selectedDeptObj,
+        date: selectedDate,
+        time: selectedSlot,
+        createdAt: new Date().toLocaleString(),
+      });
+      setStep(5);
+
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    } catch (err) {
+      // Show the real reason when we have one (e.g. a validation message
+      // from the backend); only fall back to the generic "is it running"
+      // message for genuine network failures (backend not reachable).
+      const isNetworkFailure = err instanceof TypeError;
+      setSubmitError(isNetworkFailure
+        ? (lang === 'tr'
+            ? 'Sunucuya ulaşılamadı. Sunucu çalışıyor mu kontrol edin (npm run server).'
+            : 'Could not reach the backend. Check that it is running (npm run server).')
+        : err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
@@ -320,16 +366,6 @@ export default function AppointmentWizard({
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1">T.C. Kimlik No</label>
-                <input 
-                  type="text" 
-                  value={patientForm.tcNo} 
-                  onChange={(e) => setPatientForm({...patientForm, tcNo: e.target.value})}
-                  className="w-full p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-cyan-500"
-                />
-              </div>
-
-              <div>
                 <label className="block text-slate-400 mb-1">Telefon</label>
                 <input 
                   type="text" 
@@ -366,6 +402,27 @@ export default function AppointmentWizard({
               </div>
             </div>
 
+            {/* Consent checkbox — booking is rejected server-side without this */}
+            <label className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-900/70 border border-slate-800 text-[11px] text-slate-300 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={consentGiven}
+                onChange={(e) => setConsentGiven(e.target.checked)}
+                className="mt-0.5"
+              />
+              <span>
+                {lang === 'tr'
+                  ? 'Randevu ve iletişim bilgilerimin bu randevuyu oluşturmak ve benimle iletişime geçmek amacıyla işlenmesini kabul ediyorum. (Taslak aydınlatma metni — gerçek kullanım öncesi hukuki incelemeden geçmelidir.)'
+                  : 'I agree to my appointment and contact details being processed to create this booking and to be contacted about it. (Draft consent notice — needs legal review before real-world use.)'}
+              </span>
+            </label>
+
+            {submitError && (
+              <div className="text-xs font-semibold text-red-400 bg-red-950/40 border border-red-500/30 rounded-lg px-3 py-2">
+                {submitError}
+              </div>
+            )}
+
             <div className="flex justify-between pt-4">
               <button
                 onClick={() => setStep(3)}
@@ -377,9 +434,12 @@ export default function AppointmentWizard({
 
               <button
                 onClick={handleConfirmBooking}
-                className="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-600 hover:from-emerald-400 hover:to-blue-500 text-white font-extrabold text-xs shadow-xl shadow-emerald-500/20"
+                disabled={isSubmitting || !consentGiven}
+                className="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-600 hover:from-emerald-400 hover:to-blue-500 text-white font-extrabold text-xs shadow-xl shadow-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Randevuyu Onayla ve Bilet Oluştur
+                {isSubmitting
+                  ? (lang === 'tr' ? 'Oluşturuluyor...' : 'Booking...')
+                  : (lang === 'tr' ? 'Randevuyu Onayla ve Bilet Oluştur' : 'Confirm Appointment & Generate Ticket')}
               </button>
             </div>
           </div>
@@ -394,9 +454,15 @@ export default function AppointmentWizard({
             </div>
 
             <div>
-              <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
-                SMS & E-Posta Bilgilendirmesi Gönderildi
-              </span>
+              {ticketData.emailSent ? (
+                <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                  {lang === 'tr' ? 'E-Posta Bilgilendirmesi Gönderildi' : 'Confirmation Email Sent'}
+                </span>
+              ) : (
+                <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">
+                  {lang === 'tr' ? 'Randevu Oluşturuldu (E-posta gönderilmedi — sunucuda SMTP yapılandırılmamış)' : 'Appointment Created (Email not sent — SMTP not configured on the server)'}
+                </span>
+              )}
               <h3 className="text-2xl font-extrabold text-white mt-2">Randevunuz Başarıyla Oluşturuldu!</h3>
             </div>
 
@@ -430,9 +496,13 @@ export default function AppointmentWizard({
                   </div>
                 </div>
 
-                {/* QR Code Mockup */}
+                {/* Real QR code, generated server-side from the ticket number */}
                 <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-white text-slate-950 text-center shadow-inner">
-                  <QrCode className="w-24 h-24 text-slate-950" />
+                  {ticketData.qrDataUrl ? (
+                    <img src={ticketData.qrDataUrl} alt="QR code" className="w-24 h-24" />
+                  ) : (
+                    <QrCode className="w-24 h-24 text-slate-950" />
+                  )}
                   <span className="text-[10px] font-mono font-bold mt-1">GİRİŞ QR KODU</span>
                 </div>
               </div>

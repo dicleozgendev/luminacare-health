@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>LuminaCare Staff Panel</title>
+<style>
+  :root { --bg:#0b1329; --panel:#141c35; --border:#243055; --text:#eef1f6; --muted:#8b93a7; --accent:#22d3ee; --accent-2:#34d399; --danger:#f87171; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 28px 24px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .badge { background:#3a2410; border:1px solid #6b4a1e; color:#f0b429; font-size:11px; font-weight:700; letter-spacing:.04em; padding:3px 9px; border-radius:999px; margin-left:8px; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 18px; }
+  input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0e1730; color: var(--text); font-size: 13px; margin-bottom: 10px; }
+  button { background: var(--accent); border: none; color: #04121c; font-weight: 700; padding: 9px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  button.danger { background: var(--danger); }
+  button.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; }
+  .status { padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .status.confirmed { background:#0f3d33; color: var(--accent-2); }
+  .status.cancelled { background:#3d1414; color: var(--danger); }
+  .status.completed { background:#1e2a4d; color:#93a4d6; }
+  .row-actions button { margin-right: 4px; font-size: 11px; padding: 4px 8px; }
+  #error { color: var(--danger); font-size: 12.5px; margin-top: 6px; }
+</style>
+</head>
+<body>
+  <h1>LuminaCare Staff Panel <span class="badge">DEMO / PROTOTYPE</span></h1>
+  <div class="sub">Real appointment data from this server's database. No fake numbers — this reads whatever has actually been booked.</div>
+
+  <div class="card" id="login-card">
+    <h3>Staff Login</h3>
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" onkeydown="if(event.key==='Enter') login()" />
+    <button onclick="login()">Log in</button>
+    <div id="error"></div>
+  </div>
+
+  <div class="card" id="app-card" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h3 style="margin:0;">Appointments</h3>
+      <button class="ghost" onclick="load()">Refresh</button>
+    </div>
+    <table>
+      <thead><tr><th>Ticket</th><th>Patient</th><th>Doctor</th><th>Date</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+<script>
+let token = null;
+
+async function login() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const errorEl = document.getElementById('error');
+  errorEl.textContent = '';
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email, password })
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      errorEl.textContent = body.error || ('Login failed (HTTP ' + res.status + ').');
+      return;
+    }
+    const data = await res.json();
+    token = data.token;
+    document.getElementById('login-card').style.display = 'none';
+    document.getElementById('app-card').style.display = 'block';
+    load();
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server: ' + err.message;
+  }
+}
+
+// Patient-entered data (name, phone, notes) must never go into innerHTML
+// unescaped — a booking with a name containing an HTML script tag would
+// otherwise execute in the staff member's browser the moment this list
+// loads. Everything from the database gets run through this first.
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[ch]));
+}
+
+async function load() {
+  const res = await fetch('/api/staff/appointments', { headers: { Authorization: 'Bearer ' + token } });
+  const rows = await res.json();
+  document.getElementById('rows').innerHTML = rows.map(r => `
+    <tr>
+      <td>${escapeHtml(r.ticket_no)}</td>
+      <td>${escapeHtml(r.patient_name)}<br><span style="color:var(--muted)">${escapeHtml(r.phone)}</span></td>
+      <td>${escapeHtml(r.doctor_name || '')}</td>
+      <td>${escapeHtml(r.appt_date)}</td>
+      <td>${escapeHtml(r.appt_time)}</td>
+      <td><span class="status ${escapeHtml(r.status)}">${escapeHtml(r.status)}</span></td>
+      <td class="row-actions">
+        <button onclick="setStatus(${r.id}, 'completed')">Complete</button>
+        <button class="danger" onclick="setStatus(${r.id}, 'cancelled')">Cancel</button>
+        <button class="danger" onclick="eraseRecord(${r.id})">Erase</button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="7" style="color:var(--muted)">No appointments yet.</td></tr>';
+}
+
+async function setStatus(id, status) {
+  await fetch('/api/staff/appointments/' + id, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify({ status })
+  });
+  load();
+}
+
+async function eraseRecord(id) {
+  if (!confirm('Permanently delete this record? Use this for KVKK erasure requests only — this cannot be undone.')) return;
+  await fetch('/api/staff/appointments/' + id, { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
+  load();
+}
+</script>
+</body>
+</html>
