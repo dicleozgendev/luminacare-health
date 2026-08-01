@@ -13,8 +13,53 @@ import {
 } from 'lucide-react';
 import { symptomsDb, departmentsData, doctorsData, translations } from '../data/mockData';
 
+// Was largely hardcoded Turkish regardless of `lang`. Also toned down two
+// overclaims: a fabricated "%99 match score" (this is a simple keyword
+// lookup against a local list, not a scored ML model) and "AI reviewing
+// medical data" framing — replaced with honest "matching your description
+// to a department" language, consistent with the earlier tumor-analyzer fix.
+const triageText = {
+  tr: {
+    badge: "Akıllı Poliklinik Yönlendirme Aracı",
+    titlePre: "Hangi Poliklinik Size Uygun?",
+    titleHighlight: "Şikayetinizi Yazın, Yönlendirelim",
+    desc: "Şikayetinizi doğal dille yazın; sistemimiz belirtilerinizi bilinen semptom-poliklinik eşleşmeleriyle karşılaştırarak size uygun tıbbi birimi ve hekimi önersin. Bu araç bir ön yönlendirme aracıdır, tıbbi teşhis koymaz.",
+    analyzing: "İnceleniyor...",
+    analyze: "Kontrol Et",
+    sampleLabel: "Sık Karşılaşılan Şikayet Örnekleri (Tıklayın):",
+    analyzingTitle: "Şikayetiniz Değerlendiriliyor...",
+    analyzingDesc: "Belirttiğiniz ifadeler, bilinen semptom-poliklinik eşleşme listemizle karşılaştırılıyor.",
+    recommendedDept: "Önerilen Tıbbi Uzmanlık Birimi",
+    urgencyLabel: "Aciliyet:",
+    adviceLabel: "Değerlendirme & Tavsiye:",
+    doctorsLabel: "Bu Poliklinikteki Uzman Hekimlerimiz:",
+    matchNote: "Şikayetinize Uygun",
+    yearsExp: "Yıl Deneyim",
+    bookAppt: "Randevu Al",
+  },
+  en: {
+    badge: "Smart Department Routing Tool",
+    titlePre: "Which Department Is Right for You?",
+    titleHighlight: "Describe Your Symptoms, We'll Point the Way",
+    desc: "Describe your complaint in plain language; our system compares your description against a list of known symptom-to-department matches to suggest the right unit and doctor. This tool is a preliminary routing aid — it does not provide a medical diagnosis.",
+    analyzing: "Checking...",
+    analyze: "Check",
+    sampleLabel: "Common Complaint Examples (Click to Try):",
+    analyzingTitle: "Reviewing Your Complaint...",
+    analyzingDesc: "Your description is being compared against our known symptom-to-department matches.",
+    recommendedDept: "Recommended Medical Department",
+    urgencyLabel: "Urgency:",
+    adviceLabel: "Assessment & Advice:",
+    doctorsLabel: "Our Specialists in This Department:",
+    matchNote: "Matches Your Complaint",
+    yearsExp: "Years Experience",
+    bookAppt: "Book Appointment",
+  },
+};
+
 export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
   const t = translations[lang];
+  const c = triageText[lang];
   const [symptomInput, setSymptomInput] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analyzedResult, setAnalyzedResult] = useState(null);
@@ -64,18 +109,18 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
         <div className="text-center max-w-3xl mx-auto space-y-5 mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
             <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span>AI Destekli Akıllı Triyaj Simülasyonu</span>
+            <span>{c.badge}</span>
           </div>
-          
+
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
-            Hangi Poliklinik Size Uygun? <br />
+            {c.titlePre} <br />
             <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-              AI Semptom Kontrolü ile Anında Öğrenin
+              {c.titleHighlight}
             </span>
           </h2>
-          
+
           <p className="text-slate-300 text-sm md:text-base leading-relaxed font-light">
-            Şikayetinizi doğal dille yazın; algoritmalarımız belirtilerinizi inceleyerek sizi doğru tıbbi birime ve en uygun hekime saniyeler içinde yönlendirsin.
+            {c.desc}
           </p>
         </div>
 
@@ -102,12 +147,12 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
               {isAnalyzing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Analiz Ediliyor...</span>
+                  <span>{c.analyzing}</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  <span>Analiz Et</span>
+                  <span>{c.analyze}</span>
                 </>
               )}
             </button>
@@ -117,7 +162,7 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
           <div className="space-y-3">
             <p className="text-xs font-bold text-slate-400 flex items-center gap-2">
               <HelpCircle className="w-4 h-4 text-cyan-400" />
-              Sık Karşılaşılan Şikayet Örnekleri (Tıklayın):
+              {c.sampleLabel}
             </p>
             <div className="flex flex-wrap gap-2.5">
               {sampleQueries.map((sample, idx) => (
@@ -139,8 +184,8 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
           {isAnalyzing && (
             <div className="mt-10 p-10 text-center bg-slate-950/95 rounded-2xl border border-emerald-500/40 animate-pulse space-y-4">
               <Activity className="w-12 h-12 text-emerald-400 animate-spin mx-auto" />
-              <h4 className="text-xl font-bold text-white">Yapay Zeka Tıbbi Verileri İncelemekte...</h4>
-              <p className="text-xs text-slate-400">Belirtileriniz klinik semptom veri tabanı ve poliklinik indeksleri ile eşleştiriliyor.</p>
+              <h4 className="text-xl font-bold text-white">{c.analyzingTitle}</h4>
+              <p className="text-xs text-slate-400">{c.analyzingDesc}</p>
             </div>
           )}
 
@@ -151,7 +196,7 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
               {/* Urgency & Department Header */}
               <div className="flex flex-wrap items-center justify-between gap-6 pb-6 border-b border-slate-800">
                 <div>
-                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Önerilen Tıbbi Uzmanlık Birimi</span>
+                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{c.recommendedDept}</span>
                   <h3 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3 mt-1">
                     <span className="text-emerald-400">{analyzedResult.department?.title[lang]}</span>
                   </h3>
@@ -159,7 +204,7 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
 
                 <div className={`px-5 py-2.5 rounded-2xl text-xs font-bold border flex items-center gap-2 ${analyzedResult.symptomInfo.urgencyClass}`}>
                   <AlertTriangle className="w-4 h-4" />
-                  <span>Aciliyet: {analyzedResult.symptomInfo.urgency}</span>
+                  <span>{c.urgencyLabel} {analyzedResult.symptomInfo.urgency}</span>
                 </div>
               </div>
 
@@ -167,7 +212,7 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
               <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 text-slate-300 text-sm leading-relaxed flex items-start gap-4">
                 <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-white block mb-1">Klinik Değerlendirme & Tavsiye:</strong>
+                  <strong className="text-white block mb-1">{c.adviceLabel}</strong>
                   {analyzedResult.symptomInfo.advice[lang]}
                 </div>
               </div>
@@ -175,8 +220,8 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
               {/* Suggested Doctor Cards */}
               <div>
                 <h4 className="text-sm font-bold text-slate-200 mb-5 flex items-center justify-between">
-                  <span>Bu Poliklinikteki Nöbetçi Uzman Hekimlerimiz:</span>
-                  <span className="text-xs font-semibold text-emerald-400">%99 Eşleşme Skoru</span>
+                  <span>{c.doctorsLabel}</span>
+                  <span className="text-xs font-semibold text-emerald-400">{c.matchNote}</span>
                 </h4>
 
                 <div className="grid md:grid-cols-2 gap-6">
@@ -191,7 +236,7 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
                         <div>
                           <h5 className="font-extrabold text-white text-sm">{doc.name}</h5>
                           <p className="text-xs text-cyan-400 font-semibold mt-0.5">{doc.title[lang]}</p>
-                          <p className="text-xs text-slate-400 mt-1">{doc.experience} Yıl Deneyim • ⭐ {doc.rating}</p>
+                          <p className="text-xs text-slate-400 mt-1">{doc.experience} {c.yearsExp} • ⭐ {doc.rating}</p>
                         </div>
                       </div>
 
@@ -200,7 +245,7 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
                         className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs flex items-center gap-2 shadow-md transition-all whitespace-nowrap"
                       >
                         <Calendar className="w-4 h-4" />
-                        <span>Randevu Al</span>
+                        <span>{c.bookAppt}</span>
                       </button>
                     </div>
                   ))}

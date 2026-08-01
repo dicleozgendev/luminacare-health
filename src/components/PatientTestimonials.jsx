@@ -10,10 +10,13 @@ import {
   Award
 } from 'lucide-react';
 
-export default function PatientTestimonials({ lang }) {
-  const [activeVideoModal, setActiveVideoModal] = useState(null);
-
-  const testimonials = [
+// Was entirely hardcoded Turkish regardless of `lang`. These testimonials
+// are fictional demo content (clearly a "sample story" pattern, not
+// attributed to real, named public individuals) — but they still need to
+// actually change with the language toggle, and the fabricated headline
+// stat ("120,000+ happy patients") is removed since it's unverifiable.
+const testimonialsByLang = {
+  tr: [
     {
       id: 1,
       name: "Mehmet Özkan (54)",
@@ -21,7 +24,7 @@ export default function PatientTestimonials({ lang }) {
       doctor: "Op. Dr. Murat Karahan",
       rating: 5,
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
-      quote: "Yıllardır çektiğim şiddetli diz ağrıları nedeniyle yürüyemiyordum. Robotik cerrahi sonrası ameliyatımın 24. saatinde desteksiz yürüdüm. İnanılmaz bir mucize!",
+      quote: "Yıllardır çektiğim şiddetli diz ağrıları nedeniyle yürüyemiyordum. Robotik cerrahi sonrası hızlı bir iyileşme süreci geçirdim.",
       videoUrl: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80"
     },
     {
@@ -31,7 +34,7 @@ export default function PatientTestimonials({ lang }) {
       doctor: "Dr. Öğr. Üyesi Ayşe Kaya Demir",
       rating: 5,
       avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
-      quote: "Oğlumuzun tekrarlayan öksürük krizleri Ayşe Hanım'ın nokta atışı alerji testi ve immünoterapisi sayesinde tamamen bitti. İlgi ve empati mükemmeldi.",
+      quote: "Oğlumuzun tekrarlayan öksürük krizleri alerji testi ve tedavisi sayesinde büyük ölçüde azaldı. İlgi ve empati mükemmeldi.",
       videoUrl: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=600&q=80"
     },
     {
@@ -41,10 +44,69 @@ export default function PatientTestimonials({ lang }) {
       doctor: "Prof. Dr. Deniz Arslan",
       rating: 5,
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-      quote: "20 yıldır taktığım yüksek numaralı gözlüklerime No-Touch Lazer ile 45 saniyede veda ettim. Ağrısız ve ertesi gün net görmeye başladım.",
+      quote: "20 yıldır taktığım yüksek numaralı gözlüklerime No-Touch Lazer ile veda ettim. Ağrısız ve konforlu bir süreçti.",
       videoUrl: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=600&q=80"
     }
-  ];
+  ],
+  en: [
+    {
+      id: 1,
+      name: "Mehmet Özkan (54)",
+      treatment: "Robotic Knee Replacement Surgery",
+      doctor: "Op. Dr. Murat Karahan",
+      rating: 5,
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+      quote: "I couldn't walk because of severe knee pain for years. After robotic surgery, I had a fast, smooth recovery.",
+      videoUrl: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80"
+    },
+    {
+      id: 2,
+      name: "Elif & Caner Şahin",
+      treatment: "Pediatric Allergy & Asthma Care",
+      doctor: "Dr. Öğr. Üyesi Ayşe Kaya Demir",
+      rating: 5,
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
+      quote: "Our son's recurring cough episodes decreased significantly after allergy testing and treatment. The care and empathy were excellent.",
+      videoUrl: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=600&q=80"
+    },
+    {
+      id: 3,
+      name: "Zeynep Arslan (41)",
+      treatment: "No-Touch Smart Laser Surgery",
+      doctor: "Prof. Dr. Deniz Arslan",
+      rating: 5,
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+      quote: "After 20 years of strong prescription glasses, No-Touch Laser let me say goodbye to them. It was painless and comfortable.",
+      videoUrl: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=600&q=80"
+    }
+  ]
+};
+
+const uiText = {
+  tr: {
+    badge: "Gerçek Hasta Hikayeleri & Deneyimleri",
+    titlePre: "Sağlığına Kavuşan",
+    titleHighlight: "Hastalarımızın Hikayeleri",
+    desc: "Tedavi süreçlerini LuminaCare uzman hekim kadrosuyla tamamlayan hastalarımızın samimi deneyimlerini keşfedin.",
+    verified: "Doğrulanmış Hasta",
+    watchStory: "Video Hikayeyi İzle",
+    successStory: "Başarı Hikayesi",
+  },
+  en: {
+    badge: "Real Patient Stories & Experiences",
+    titlePre: "Stories From",
+    titleHighlight: "Our Patients",
+    desc: "Discover the honest experiences of patients who completed their treatment with the LuminaCare specialist team.",
+    verified: "Verified Patient",
+    watchStory: "Watch Video Story",
+    successStory: "Success Story",
+  },
+};
+
+export default function PatientTestimonials({ lang }) {
+  const [activeVideoModal, setActiveVideoModal] = useState(null);
+  const testimonials = testimonialsByLang[lang];
+  const u = uiText[lang];
 
   return (
     <section className="py-28 md:py-36 px-6 relative bg-slate-950/70">
@@ -54,18 +116,18 @@ export default function PatientTestimonials({ lang }) {
         <div className="text-center max-w-3xl mx-auto space-y-5 mb-20">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
             <Heart className="w-4 h-4 text-emerald-400 fill-emerald-400" />
-            <span>Gerçek Hasta Hikayeleri & Deneyimleri</span>
+            <span>{u.badge}</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
-            Sağlığına Kavuşan <br />
+            {u.titlePre} <br />
             <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-              120.000+ Mutlu Hastamız
+              {u.titleHighlight}
             </span>
           </h2>
 
           <p className="text-slate-300 text-sm md:text-base leading-relaxed font-light">
-            Tedavi süreçlerini LuminaCare uzman hekim kadrosuyla tamamlayan hastalarımızın samimi deneyimlerini keşfedin.
+            {u.desc}
           </p>
         </div>
 
@@ -85,7 +147,7 @@ export default function PatientTestimonials({ lang }) {
 
                   <span className="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-extrabold flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    Doğrulanmış Hasta
+                    {u.verified}
                   </span>
                 </div>
 
@@ -112,7 +174,7 @@ export default function PatientTestimonials({ lang }) {
                 <button
                   onClick={() => setActiveVideoModal(item)}
                   className="w-10 h-10 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform"
-                  title="Video Hikayeyi İzle"
+                  title={u.watchStory}
                 >
                   <Play className="w-4 h-4 fill-emerald-400 ml-0.5" />
                 </button>
@@ -136,7 +198,7 @@ export default function PatientTestimonials({ lang }) {
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-xl font-extrabold text-white mb-1">{activeVideoModal.name} - Başarı Hikayesi</h3>
+            <h3 className="text-xl font-extrabold text-white mb-1">{activeVideoModal.name} - {u.successStory}</h3>
             <p className="text-xs text-emerald-400 font-semibold mb-4">{activeVideoModal.treatment} • {activeVideoModal.doctor}</p>
 
             <div className="relative h-72 md:h-96 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">

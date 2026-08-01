@@ -11,8 +11,69 @@ import {
 } from 'lucide-react';
 import { translations } from '../data/mockData';
 
+// Was largely hardcoded Turkish regardless of `lang` (legal notice, all
+// footer link columns, contact block, bottom bar) — only a couple of
+// strings actually went through `translations[lang]`.
+const footerText = {
+  tr: {
+    legalNoticeTitle: "Yasal Sorumluluk Reddi & Demo Bildirimi:",
+    legalNoticeBody: "Bu web sitesi, hastaneler ve poliklinikler için ajans / müşteri gösterimi amacıyla hazırlanmış interaktif bir demo prototipidir. Sitede yer alan doktor isimleri, tahlil verileri ve randevu kayıtları kurgusaldır. Gerçek tıbbi teşhis, tedavi veya acil servis hizmeti vermez.",
+    bio: "LuminaCare Tıp Kompleksi, teknoloji ile insan empatisini birleştiren modern, hasta odaklı bir sağlık kuruluşudur.",
+    supportBadge: "7/24 Hasta Desteği",
+    infraBadge: "Modern Tıbbi Altyapı",
+    quickAccess: "Hızlı Erişim",
+    linkBookAppointment: "Online Randevu Al",
+    linkLabResults: "Laboratuvar Tahlil Sonuçları",
+    linkTriage: "Yapay Zeka Semptom Triyajı",
+    linkDoctors: "Uzman Hekim Kadromuz",
+    linkCheckup: "Check-Up Paketleri",
+    departmentsHeading: "Tıbbi Birimler",
+    deptCardiology: "Kardiyoloji & Kalp Sağlığı",
+    deptNeurology: "Nöroloji & Beyin Cerrahisi",
+    deptPediatrics: "Çocuk Sağlığı & Hastalıkları",
+    deptOrthopedics: "Ortopedi & Robotik Cerrahi",
+    deptOphthalmology: "Göz Hastalıkları & Lazer",
+    deptDermatology: "Dermatoloji & Estetik",
+    contactHeading: "İletişim & Santral",
+    callCenter: "Çağrı Merkezi: 444 0 911",
+    addressLine: "Levent Maslak Medikal Bölgesi No: 204, İstanbul",
+    copyright: "© 2026 LuminaCare Medical Center (Demo Portalı). Tüm Hakları Saklıdır.",
+    kvkkText: "KVKK Metni (Demo)",
+    privacyPolicy: "Gizlilik Politikası",
+    terms: "Yasal Kullanım Koşulları",
+  },
+  en: {
+    legalNoticeTitle: "Legal Disclaimer & Demo Notice:",
+    legalNoticeBody: "This website is an interactive demo prototype built for agency/client presentation purposes for hospitals and clinics. Doctor names, test results, and appointment records shown here are fictional. It does not provide real medical diagnosis, treatment, or emergency services.",
+    bio: "LuminaCare Medical Complex is a modern, patient-centered healthcare organization combining technology with human empathy.",
+    supportBadge: "24/7 Patient Support",
+    infraBadge: "Modern Medical Infrastructure",
+    quickAccess: "Quick Access",
+    linkBookAppointment: "Book Online Appointment",
+    linkLabResults: "Lab & Test Results",
+    linkTriage: "AI Symptom Triage",
+    linkDoctors: "Our Medical Specialists",
+    linkCheckup: "Check-Up Packages",
+    departmentsHeading: "Medical Specialties",
+    deptCardiology: "Cardiology & Heart Health",
+    deptNeurology: "Neurology & Neurosurgery",
+    deptPediatrics: "Pediatrics & Child Health",
+    deptOrthopedics: "Orthopedics & Robotic Surgery",
+    deptOphthalmology: "Ophthalmology & Laser Eye",
+    deptDermatology: "Dermatology & Aesthetics",
+    contactHeading: "Contact & Switchboard",
+    callCenter: "Call Center: 444 0 911",
+    addressLine: "Levent Maslak Medical District No: 204, Istanbul",
+    copyright: "© 2026 LuminaCare Medical Center (Demo Portal). All Rights Reserved.",
+    kvkkText: "KVKK Notice (Demo)",
+    privacyPolicy: "Privacy Policy",
+    terms: "Terms of Use",
+  },
+};
+
 export default function Footer({ lang, onOpenAppointment, onOpenPatientPortal }) {
   const t = translations[lang];
+  const f = footerText[lang];
 
   return (
     <footer className="bg-slate-950 text-slate-400 border-t border-slate-800/80 pt-20 pb-10 px-6">
@@ -22,9 +83,9 @@ export default function Footer({ lang, onOpenAppointment, onOpenPatientPortal })
         <div className="p-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-4">
           <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <strong className="text-white block font-bold text-sm">Yasal Sorumluluk Reddi & Demo Bildirimi:</strong>
+            <strong className="text-white block font-bold text-sm">{f.legalNoticeTitle}</strong>
             <p className="leading-relaxed">
-              Bu web sitesi, hastaneler ve poliklinikler için ajans / müşteri gösterimi amacıyla hazırlanmış interaktif bir demo prototipidir. Sitede yer alan doktor isimleri, tahlil verileri ve randevu kayıtları kurgusaldır. Gerçek tıbbi teşhis, tedavi veya acil servis hizmeti vermez.
+              {f.legalNoticeBody}
             </p>
           </div>
         </div>
@@ -49,63 +110,67 @@ export default function Footer({ lang, onOpenAppointment, onOpenPatientPortal })
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm font-light">
-              LuminaCare Tıp Kompleksi, robotiğin gücü ve insan empatisini birleştiren uluslararası akredite A-Segment sağlık kuruluşudur.
+              {f.bio}
             </p>
 
+            {/* Was "JCI Akredite Hastane" and "ISO 9001:2026" — both are
+                real, verifiable third-party certifications. Never claim
+                them here; only add them back for a specific real clinic
+                that actually holds that certification, with proof. */}
             <div className="flex items-center gap-3 text-xs text-slate-300">
               <span className="flex items-center gap-1.5 text-emerald-400 font-semibold bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/30">
                 <ShieldCheck className="w-4 h-4" />
-                JCI Akredite Hastane
+                {f.supportBadge}
               </span>
               <span className="flex items-center gap-1.5 text-cyan-400 font-semibold bg-cyan-500/10 px-3 py-1 rounded-lg border border-cyan-500/30">
                 <Award className="w-4 h-4" />
-                ISO 9001:2026
+                {f.infraBadge}
               </span>
             </div>
           </div>
 
-          {/* Col 2: Hızlı Bağlantılar */}
+          {/* Col 2: Quick links */}
           <div className="space-y-4 text-xs">
-            <h4 className="font-bold text-white text-sm">Hızlı Erişim</h4>
+            <h4 className="font-bold text-white text-sm">{f.quickAccess}</h4>
             <ul className="space-y-2.5">
               <li>
                 <button onClick={onOpenAppointment} className="hover:text-cyan-400 flex items-center gap-1.5 transition-colors">
                   <ChevronRight className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Online Randevu Al</span>
+                  <span>{f.linkBookAppointment}</span>
                 </button>
               </li>
               <li>
                 <button onClick={onOpenPatientPortal} className="hover:text-cyan-400 flex items-center gap-1.5 transition-colors">
                   <ChevronRight className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Laboratuvar Tahlil Sonuçları</span>
+                  <span>{f.linkLabResults}</span>
                 </button>
               </li>
-              <li><a href="#triage" className="hover:text-cyan-400">Yapay Zeka Semptom Triyajı</a></li>
-              <li><a href="#doctors" className="hover:text-cyan-400">Uzman Hekim Kadromuz</a></li>
-              <li><a href="#checkup" className="hover:text-cyan-400">Check-Up Paketleri</a></li>
+              <li><a href="#triage" className="hover:text-cyan-400">{f.linkTriage}</a></li>
+              <li><a href="#doctors" className="hover:text-cyan-400">{f.linkDoctors}</a></li>
+              <li><a href="#checkup" className="hover:text-cyan-400">{f.linkCheckup}</a></li>
             </ul>
           </div>
 
-          {/* Col 3: Poliklinikler */}
+          {/* Col 3: Departments */}
           <div className="space-y-4 text-xs">
-            <h4 className="font-bold text-white text-sm">Tıbbi Birimler</h4>
+            <h4 className="font-bold text-white text-sm">{f.departmentsHeading}</h4>
             <ul className="space-y-2.5">
-              <li><a href="#departments" className="hover:text-cyan-400">Kardiyoloji & Kalp Sağlığı</a></li>
-              <li><a href="#departments" className="hover:text-cyan-400">Nöroloji & Beyin Cerrahisi</a></li>
-              <li><a href="#departments" className="hover:text-cyan-400">Çocuk Sağlığı & Hastalıkları</a></li>
-              <li><a href="#departments" className="hover:text-cyan-400">Ortopedi & Robotik Cerrahi</a></li>
-              <li><a href="#departments" className="hover:text-cyan-400">Göz Hastalıkları & Lazer</a></li>
-              <li><a href="#departments" className="hover:text-cyan-400">Dermatoloji & Estetik</a></li>
+              <li><a href="#departments" className="hover:text-cyan-400">{f.deptCardiology}</a></li>
+              <li><a href="#departments" className="hover:text-cyan-400">{f.deptNeurology}</a></li>
+              <li><a href="#departments" className="hover:text-cyan-400">{f.deptPediatrics}</a></li>
+              <li><a href="#departments" className="hover:text-cyan-400">{f.deptOrthopedics}</a></li>
+              <li><a href="#departments" className="hover:text-cyan-400">{f.deptOphthalmology}</a></li>
+              <li><a href="#departments" className="hover:text-cyan-400">{f.deptDermatology}</a></li>
             </ul>
           </div>
 
-          {/* Col 4: İletişim */}
+          {/* Col 4: Contact */}
           <div className="space-y-4 text-xs">
-            <h4 className="font-bold text-white text-sm">İletişim & Santral</h4>
+            <h4 className="font-bold text-white text-sm">{f.contactHeading}</h4>
             <div className="space-y-3">
               <p className="flex items-center gap-2.5 text-slate-300">
                 <Phone className="w-4 h-4 text-cyan-400" />
-                <span>Çağrı Merkezi: 444 0 911</span>
+                <span>{f.callCenter}</span>
               </p>
               <p className="flex items-center gap-2.5 text-slate-300">
                 <Mail className="w-4 h-4 text-emerald-400" />
@@ -113,7 +178,7 @@ export default function Footer({ lang, onOpenAppointment, onOpenPatientPortal })
               </p>
               <p className="flex items-start gap-2.5 text-slate-400">
                 <MapPin className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-                <span>Levent Maslak Medikal Bölgesi No: 204, İstanbul</span>
+                <span>{f.addressLine}</span>
               </p>
             </div>
           </div>
@@ -122,11 +187,11 @@ export default function Footer({ lang, onOpenAppointment, onOpenPatientPortal })
 
         {/* Bottom Bar */}
         <div className="pt-10 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2026 LuminaCare Medical Center (Demo Portalı). Tüm Hakları Saklıdır.</p>
+          <p>{f.copyright}</p>
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-slate-400">KVKK Metni (Demo)</a>
-            <a href="#" className="hover:text-slate-400">Gizlilik Politikası</a>
-            <a href="#" className="hover:text-slate-400">Yasal Kullanım Koşulları</a>
+            <a href="#" className="hover:text-slate-400">{f.kvkkText}</a>
+            <a href="#" className="hover:text-slate-400">{f.privacyPolicy}</a>
+            <a href="#" className="hover:text-slate-400">{f.terms}</a>
           </div>
         </div>
 

@@ -18,7 +18,7 @@ export default function Departments({ lang, onSelectDeptForBooking }) {
         <div className="text-center max-w-3xl mx-auto space-y-5 mb-20">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold">
             <Building2 className="w-4 h-4 text-cyan-400" />
-            <span>Mükemmeliyet Merkezlerimiz</span>
+            <span>{t.deptSectionBadge}</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
@@ -26,7 +26,7 @@ export default function Departments({ lang, onSelectDeptForBooking }) {
           </h2>
 
           <p className="text-slate-300 text-sm md:text-base leading-relaxed font-light">
-            Son jenerasyon tanı cihazları, hibrit ameliyathaneler ve kendi branşında dünyaca tanınan profesör hekim kadrolarımızla hizmetinizdeyiz.
+            {t.deptSectionDesc}
           </p>
         </div>
 
@@ -58,7 +58,7 @@ export default function Departments({ lang, onSelectDeptForBooking }) {
                     {dept.title[lang]}
                   </h3>
                   <span className="text-xs text-slate-300 font-semibold mt-0.5 block">
-                    {dept.specsCount} Kadrolu Uzman Hekim
+                    {dept.specsCount} {t.onStaffSpecialists}
                   </span>
                 </div>
               </div>
@@ -71,7 +71,7 @@ export default function Departments({ lang, onSelectDeptForBooking }) {
 
                 {/* Popular Symptoms handled */}
                 <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 text-xs text-slate-400">
-                  <strong className="text-cyan-400 block mb-1 font-bold">Sık Tedavi Edilen Şikayetler:</strong>
+                  <strong className="text-cyan-400 block mb-1 font-bold">{t.commonComplaints}</strong>
                   <span>{dept.popularSymptom[lang]}</span>
                 </div>
 
@@ -81,7 +81,7 @@ export default function Departments({ lang, onSelectDeptForBooking }) {
                   className="w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-cyan-950/60 border border-slate-700 hover:border-cyan-500/50 text-white font-bold text-xs flex items-center justify-center gap-2 group-hover:text-cyan-300 transition-all shadow-md"
                 >
                   <Stethoscope className="w-4 h-4 text-cyan-400" />
-                  <span>Bu Poliklinikten Randevu Al</span>
+                  <span>{t.bookFromDepartment}</span>
                   <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>

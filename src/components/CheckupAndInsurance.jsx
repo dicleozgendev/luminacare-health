@@ -11,8 +11,37 @@ import {
 } from 'lucide-react';
 import { checkupPackages, insuranceProviders, translations } from '../data/mockData';
 
+// Was largely hardcoded Turkish regardless of `lang`. Also softened the
+// original absolute "%100 valid/agreed with all insurers" claims — actual
+// coverage depends on the patient's specific policy, so we don't assert 100%.
+const checkupText = {
+  tr: {
+    badge: "Kişiselleştirilmiş Koruyucu Tıp",
+    title: "VIP Check-Up Paketleri & Anlaşmalı Sigortalar",
+    desc: "Hastalıklar ortaya çıkmadan önlem alın. Yaş, cinsiyet ve yaşam tarzınıza özel hazırlanan bütüncül tıp paketlerimizi inceleyin.",
+    bookCheckup: "Check-Up Randevusu Al",
+    insuranceTitle: "Sağlık Sigortanızı Sorgulayın",
+    insuranceDesc: "Türkiye genelinde birçok Özel Sağlık Sigortası (ÖSS) ve Tamamlayıcı Sağlık Sigortası (TSS) kurumuyla anlaşmamız bulunmaktadır. Kesin teminat kapsamı poliçenize göre değişebilir; randevu öncesi doğrulamanızı öneririz.",
+    selectedInstitution: "Seçili Kurum:",
+    coverageStatus: "Teminat Durumu:",
+    partnered: "Anlaşmalı Kurum",
+  },
+  en: {
+    badge: "Personalized Preventive Medicine",
+    title: "VIP Check-Up Packages & Partner Insurers",
+    desc: "Take precautions before illness strikes. Explore our holistic medical packages tailored to your age, gender, and lifestyle.",
+    bookCheckup: "Book a Check-Up",
+    insuranceTitle: "Check Your Health Insurance",
+    insuranceDesc: "We have partnership agreements with many private health insurers and supplementary health insurance providers across Turkey. Exact coverage depends on your specific policy; we recommend confirming before your appointment.",
+    selectedInstitution: "Selected Provider:",
+    coverageStatus: "Coverage Status:",
+    partnered: "Partner Provider",
+  },
+};
+
 export default function CheckupAndInsurance({ lang, onOpenAppointment }) {
   const t = translations[lang];
+  const c = checkupText[lang];
   const [selectedInsurance, setSelectedInsurance] = useState(insuranceProviders[0]);
 
   return (
@@ -23,15 +52,15 @@ export default function CheckupAndInsurance({ lang, onOpenAppointment }) {
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold">
             <Sparkles className="w-4 h-4 text-cyan-400" />
-            <span>Kişiselleştirilmiş Koruyucu Tıp</span>
+            <span>{c.badge}</span>
           </div>
 
           <h2 className="text-3xl md:text-4xl font-extrabold text-white">
-            VIP Check-Up Paketleri & Anlaşmalı Sigortalar
+            {c.title}
           </h2>
 
           <p className="text-slate-400 text-sm md:text-base leading-relaxed">
-            Hastalıklar ortaya çıkmadan önlem alın. Yaş, cinsiyet ve yaşam tarzınıza özel hazırlanan bütüncül tıp paketlerimizi inceleyin.
+            {c.desc}
           </p>
         </div>
 
@@ -83,7 +112,7 @@ export default function CheckupAndInsurance({ lang, onOpenAppointment }) {
                 }`}
               >
                 <Calendar className="w-4 h-4" />
-                <span>Check-Up Randevusu Al</span>
+                <span>{c.bookCheckup}</span>
               </button>
 
             </div>
@@ -101,20 +130,20 @@ export default function CheckupAndInsurance({ lang, onOpenAppointment }) {
               </div>
               
               <h3 className="text-2xl font-extrabold text-white">
-                Sağlık Sigortanız LuminaCare'de %100 Geçerli
+                {c.insuranceTitle}
               </h3>
 
               <p className="text-xs text-slate-400 leading-relaxed">
-                Tüm Türkiye genelinde geçerli Özel Sağlık Sigortaları (ÖSS) ve Tamamlayıcı Sağlık Sigortaları (TSS) ile doğrudan provizyon anlaşmamız mevcuttur.
+                {c.insuranceDesc}
               </p>
 
               <div className="p-4 rounded-xl bg-slate-900 border border-emerald-500/30 space-y-1">
                 <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Seçili Kurum: {selectedInsurance.name}</span>
+                  <span>{c.selectedInstitution} {selectedInsurance.name}</span>
                 </div>
                 <p className="text-xs text-slate-300">
-                  Teminat Durumu: <strong className="text-white">{selectedInsurance.coverage}</strong>
+                  {c.coverageStatus} <strong className="text-white">{selectedInsurance.coverage[lang]}</strong>
                 </p>
               </div>
             </div>
@@ -133,7 +162,7 @@ export default function CheckupAndInsurance({ lang, onOpenAppointment }) {
                 >
                   <span className="text-2xl block mb-1">{ins.logo}</span>
                   <span className="font-bold text-xs block text-slate-200">{ins.name}</span>
-                  <span className="text-[10px] text-emerald-400 mt-1 block font-medium">%100 Anlaşmalı</span>
+                  <span className="text-[10px] text-emerald-400 mt-1 block font-medium">{c.partnered}</span>
                 </button>
               ))}
             </div>

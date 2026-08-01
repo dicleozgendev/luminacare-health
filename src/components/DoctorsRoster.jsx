@@ -11,19 +11,64 @@ import {
   Globe,
   Clock
 } from 'lucide-react';
-import { doctorsData, departmentsData, translations } from '../data/mockData';
+import { doctorsData, departmentsData, translations, symptomsDb } from '../data/mockData';
+
+// A handful of strings here were still hardcoded Turkish regardless of `lang`.
+const rosterText = {
+  tr: {
+    badge: "Deneyimli Uzman Kadromuz",
+    subtitle: "Hasta odaklı yaklaşımı benimseyen, alanında deneyimli uzman hekim kadromuzla tanışın.",
+    telehealthBadge: "Online Muayene",
+    reviews: "Görüş",
+    specialistBadge: "Uzman Hekim",
+    languagesSpoken: "Konuşulan Diller:",
+    education: "Eğitim & Akademik Geçmiş",
+    clinicalBackground: "Klinik Uzmanlık & Özgeçmiş",
+    nearestSlots: "En Yakın Uygun Randevu Saatleri",
+    close: "Kapat",
+    bookThisDoctor: "Bu Hekim İçin Randevu Al",
+  },
+  en: {
+    badge: "Our Experienced Specialist Team",
+    subtitle: "Meet our patient-focused, experienced team of specialist physicians.",
+    telehealthBadge: "Telehealth Available",
+    reviews: "Reviews",
+    specialistBadge: "Specialist Physician",
+    languagesSpoken: "Languages Spoken:",
+    education: "Education & Academic Background",
+    clinicalBackground: "Clinical Expertise & Background",
+    nearestSlots: "Nearest Available Appointment Times",
+    close: "Close",
+    bookThisDoctor: "Book Appointment With This Doctor",
+  },
+};
 
 export default function DoctorsRoster({ lang, onSelectDoctorForBooking }) {
   const t = translations[lang];
+  const r = rosterText[lang];
   const [selectedDeptFilter, setSelectedDeptFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeDoctorModal, setActiveDoctorModal] = useState(null);
 
+  const q = searchQuery.trim().toLowerCase();
+
+  // The search placeholder promises matching by doctor name, specialty,
+  // OR complaint ("şikayet arayın") — but only name/title were ever
+  // actually matched, so a symptom search like "baş ağrısı" silently
+  // returned nothing. This reuses the existing symptomsDb (already used
+  // by the triage widget) so the search does what it says.
+  const matchingDeptIdsFromSymptom = q
+    ? symptomsDb
+        .filter((entry) => entry.keywords.some((k) => k.toLowerCase().includes(q) || q.includes(k.toLowerCase())))
+        .map((entry) => entry.departmentId)
+    : [];
+
   const filteredDoctors = doctorsData.filter(doc => {
     const matchesDept = selectedDeptFilter === 'all' || doc.departmentId === selectedDeptFilter;
-    const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          doc.title[lang].toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesDept && matchesSearch;
+    if (!q) return matchesDept;
+    const matchesNameOrTitle = doc.name.toLowerCase().includes(q) || doc.title[lang].toLowerCase().includes(q);
+    const matchesSymptom = matchingDeptIdsFromSymptom.includes(doc.departmentId);
+    return matchesDept && (matchesNameOrTitle || matchesSymptom);
   });
 
   return (
@@ -33,15 +78,19 @@ export default function DoctorsRoster({ lang, onSelectDoctorForBooking }) {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
           <div className="space-y-3">
+            {/* Was "Dünya Standartlarında Medikal Kadro" + a subtitle
+                claiming "international accreditation, scientific
+                publications, and thousands of successful cases" — none of
+                that is verifiable for this demo roster, so it's gone. */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold">
               <UserCheck className="w-4 h-4 text-cyan-400" />
-              <span>Dünya Standartlarında Medikal Kadro</span>
+              <span>{r.badge}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white">
               {t.ourDoctors}
             </h2>
             <p className="text-slate-300 text-sm md:text-base max-w-xl font-light leading-relaxed">
-              Uluslararası akreditasyona sahip, alanında bilimsel yayınları ve binlerce başarılı vakası bulunan uzman hekim kadromuzla tanışın.
+              {r.subtitle}
             </p>
           </div>
 
@@ -101,7 +150,7 @@ export default function DoctorsRoster({ lang, onSelectDoctorForBooking }) {
                 {doc.telehealth && (
                   <span className="px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center gap-1.5">
                     <Video className="w-3.5 h-3.5" />
-                    Online Muayene
+                    {r.telehealthBadge}
                   </span>
                 )}
               </div>
@@ -123,7 +172,7 @@ export default function DoctorsRoster({ lang, onSelectDoctorForBooking }) {
                   <div className="flex items-center gap-1.5 text-xs text-amber-400 font-bold pt-1">
                     <Star className="w-4 h-4 fill-amber-400" />
                     <span>{doc.rating}</span>
-                    <span className="text-slate-500 font-normal">({doc.reviewCount} Görüş)</span>
+                    <span className="text-slate-500 font-normal">({doc.reviewCount} {r.reviews})</span>
                   </div>
                 </div>
               </div>
@@ -177,8 +226,13 @@ export default function DoctorsRoster({ lang, onSelectDoctorForBooking }) {
               />
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
+                  {/* Was "JCI Sertifikalı Hekim" — JCI accredits healthcare
+                      organizations, not individual physicians, so that
+                      badge was factually wrong as well as unverified.
+                      "Uzman Hekim" (specialist physician) is what the
+                      title field already conveys accurately. */}
                   <span className="px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
-                    JCI Sertifikalı Hekim
+                    {r.specialistBadge}
                   </span>
                   <div className="flex items-center gap-1 text-xs text-amber-400 font-bold">
                     <Star className="w-4 h-4 fill-amber-400" />
@@ -190,7 +244,7 @@ export default function DoctorsRoster({ lang, onSelectDoctorForBooking }) {
                 <p className="text-sm font-semibold text-cyan-400">{activeDoctorModal.title[lang]}</p>
                 <p className="text-xs text-slate-400 flex items-center gap-2 pt-1">
                   <Globe className="w-4 h-4 text-slate-500" />
-                  Konuşulan Diller: {activeDoctorModal.languages.join(", ")}
+                  {r.languagesSpoken} {activeDoctorModal.languages.join(", ")}
                 </p>
               </div>
             </div>
@@ -201,7 +255,7 @@ export default function DoctorsRoster({ lang, onSelectDoctorForBooking }) {
               <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800">
                 <h4 className="font-bold text-white text-sm mb-1.5 flex items-center gap-2">
                   <GraduationCap className="w-4 h-4 text-cyan-400" />
-                  Eğitim & Akademik Geçmiş
+                  {r.education}
                 </h4>
                 <p className="text-slate-400 leading-relaxed">{activeDoctorModal.education[lang]}</p>
               </div>
@@ -209,7 +263,7 @@ export default function DoctorsRoster({ lang, onSelectDoctorForBooking }) {
               <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800">
                 <h4 className="font-bold text-white text-sm mb-1.5 flex items-center gap-2">
                   <Award className="w-4 h-4 text-emerald-400" />
-                  Klinik Uzmanlık & Özgeçmiş
+                  {r.clinicalBackground}
                 </h4>
                 <p className="text-slate-300 leading-relaxed">{activeDoctorModal.bio[lang]}</p>
               </div>
@@ -217,7 +271,7 @@ export default function DoctorsRoster({ lang, onSelectDoctorForBooking }) {
               <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800">
                 <h4 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-amber-400" />
-                  En Yakın Uygun Randevu Saatleri
+                  {r.nearestSlots}
                 </h4>
                 <div className="flex flex-wrap gap-2.5">
                   {activeDoctorModal.availableSlots.map((slot, i) => (
@@ -236,9 +290,9 @@ export default function DoctorsRoster({ lang, onSelectDoctorForBooking }) {
                 onClick={() => setActiveDoctorModal(null)}
                 className="px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs"
               >
-                Kapat
+                {r.close}
               </button>
-              
+
               <button
                 onClick={() => {
                   const doc = activeDoctorModal;
@@ -247,7 +301,7 @@ export default function DoctorsRoster({ lang, onSelectDoctorForBooking }) {
                 }}
                 className="px-7 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-xs shadow-lg shadow-cyan-500/25"
               >
-                Bu Hekim İçin Randevu Al
+                {r.bookThisDoctor}
               </button>
             </div>
 

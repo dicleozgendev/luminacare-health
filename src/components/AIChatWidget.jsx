@@ -1,34 +1,33 @@
-import React, { useState } from 'react';
-import { 
-  MessageSquare, 
-  X, 
-  Send, 
-  Bot, 
-  Sparkles, 
-  Calendar, 
-  FileText, 
+import React, { useState, useEffect } from 'react';
+import {
+  MessageSquare,
+  X,
+  Send,
+  Bot,
+  Sparkles,
+  Calendar,
+  FileText,
   PhoneCall,
   User
 } from 'lucide-react';
+import { translations } from '../data/mockData';
 
 export default function AIChatWidget({ lang, onOpenAppointment, onOpenPatientPortal }) {
+  const t = translations[lang];
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    {
-      sender: 'bot',
-      text: 'Merhaba! Ben LuminaCare AI Sağlık Asistanı. Size nasıl yardımcı olabilirim?',
-      time: '14:00'
-    }
+    { sender: 'bot', text: t.chatGreeting, time: '14:00' }
   ]);
   const [inputVal, setInputVal] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  const quickQuestions = [
-    { label: '📅 Randevu Nasıl Alınır?', answer: 'Yukarıdaki "Randevu Al" butonuna tıklayarak 4 adımda poliklinik, hekim ve saat seçebilirsiniz. İsterseniz şimdi randevu sihirbazını açabilirim.', action: 'appointment' },
-    { label: '🧪 E-Sonuç Sorgulama', answer: 'Laboratuvar tahlili ve MR sonuçlarınızı T.C. Kimlik numaranız ile E-Sonuç portalımızdan sorgulayabilirsiniz.', action: 'portal' },
-    { label: '🛡️ Anlaşmalı Sigortalar', answer: 'Allianz, AXA, Acıbadem, Sompo, MAPFRE ve Anadolu Sigorta dahil tüm Özel ve Tamamlayıcı Sağlık Sigortaları hastanemizde %100 geçerlidir.', action: null },
-    { label: '🚑 Acil Servis Telefonu', answer: '24/7 Acil Servis ve Ambulans hattımız: 444 0 911 numaralı telefondan kesintisiz hizmet vermektedir.', action: null }
-  ];
+  // Was hardcoded Turkish regardless of `lang` — the whole widget ignored
+  // the language toggle. Re-seed the greeting whenever the language changes.
+  useEffect(() => {
+    setMessages([{ sender: 'bot', text: t.chatGreeting, time: '14:00' }]);
+  }, [lang]);
+
+  const quickQuestions = t.chatQuickQuestions;
 
   const handleSend = (textToSend) => {
     const query = textToSend || inputVal;
@@ -45,15 +44,15 @@ export default function AIChatWidget({ lang, onOpenAppointment, onOpenPatientPor
     setIsTyping(true);
 
     setTimeout(() => {
-      let replyText = 'Sorunuz medikal asistan ekibimize iletildi. Acil durumlar için lütfen 444 0 911 Acil Çağrı hattımızı arayınız.';
-      
+      let replyText = t.chatDefaultReply;
+
       const qLower = query.toLowerCase();
-      if (qLower.includes('randevu')) {
-        replyText = 'Hemen randevu sihirbazını başlatabilir veya uzman kadromuzdan hekim seçebilirsiniz.';
-      } else if (qLower.includes('tahlil') || qLower.includes('sonuç') || qLower.includes('mr')) {
-        replyText = 'Tahlil ve radyoloji sonuçlarınızı E-Sonuç portalımızdan PDF olarak indirebilirsiniz.';
-      } else if (qLower.includes('sigorta') || qLower.includes('allianz') || qLower.includes('axa')) {
-        replyText = 'Tüm özel sağlık sigortaları için %100 doğrudan provizyon anlaşmamız mevcuttur.';
+      if (qLower.includes('randevu') || qLower.includes('appointment') || qLower.includes('book')) {
+        replyText = t.chatApptReply;
+      } else if (qLower.includes('tahlil') || qLower.includes('sonuç') || qLower.includes('mr') || qLower.includes('result') || qLower.includes('test')) {
+        replyText = t.chatResultsReply;
+      } else if (qLower.includes('sigorta') || qLower.includes('allianz') || qLower.includes('axa') || qLower.includes('insurance')) {
+        replyText = t.chatInsuranceReply;
       }
 
       setMessages(prev => [
@@ -83,10 +82,10 @@ export default function AIChatWidget({ lang, onOpenAppointment, onOpenPatientPor
           </span>
           
           <Bot className="w-5 h-5 text-white" />
-          <span className="hidden sm:inline">LuminaAI Asistanı</span>
+          <span className="hidden sm:inline">{t.chatWidgetLabel}</span>
 
           <span className="absolute -top-2 -right-1 bg-amber-400 text-slate-950 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">
-            24/7 Canlı
+            {lang === 'tr' ? '24/7 Canlı' : '24/7 Live'}
           </span>
         </button>
       )}
@@ -105,12 +104,12 @@ export default function AIChatWidget({ lang, onOpenAppointment, onOpenPatientPor
               </div>
               <div>
                 <h4 className="font-extrabold text-white text-sm flex items-center gap-1.5">
-                  <span>LuminaAI Asistanı</span>
+                  <span>{t.chatWidgetLabel}</span>
                   <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
                 </h4>
                 <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Çevrimiçi & Hazır
+                  {t.chatOnlineStatus}
                 </span>
               </div>
             </div>
@@ -152,7 +151,7 @@ export default function AIChatWidget({ lang, onOpenAppointment, onOpenPatientPor
             {isTyping && (
               <div className="flex items-center gap-2 text-slate-400 text-xs italic">
                 <Bot className="w-4 h-4 text-cyan-400 animate-spin" />
-                <span>LuminaAI yanıt yazıyor...</span>
+                <span>{t.chatTypingIndicator}</span>
               </div>
             )}
           </div>
@@ -160,7 +159,7 @@ export default function AIChatWidget({ lang, onOpenAppointment, onOpenPatientPor
           {/* Preset Quick Questions */}
           <div className="p-3 bg-slate-900/60 border-t border-slate-800/80 space-y-1.5">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
-              Hızlı Sorular:
+              {t.chatQuickQuestionsLabel}
             </span>
             <div className="flex flex-wrap gap-1.5">
               {quickQuestions.map((q, idx) => (
@@ -191,7 +190,7 @@ export default function AIChatWidget({ lang, onOpenAppointment, onOpenPatientPor
               type="text"
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
-              placeholder="Bir soru sorun..."
+              placeholder={t.chatInputPlaceholder}
               className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs focus:outline-none focus:border-cyan-500"
             />
             <button

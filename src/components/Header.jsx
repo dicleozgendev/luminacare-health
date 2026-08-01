@@ -35,16 +35,16 @@ export default function Header({
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-badge-dot" />
-              Acil Bekleme: ~6 Dk
+              {t.erWaitTime}~6 {lang === 'tr' ? 'Dk' : 'min'}
             </span>
             <span className="hidden sm:inline-block text-slate-500">|</span>
-            <span className="hidden sm:inline-block text-slate-400">24/7 Travma & Ambulans Hizmeti</span>
+            <span className="hidden sm:inline-block text-slate-400">{t.traumaService}</span>
           </div>
 
           <div className="flex items-center gap-3">
             <a href="tel:4440911" className="flex items-center gap-1 text-red-400 font-bold hover:text-red-300 transition-colors">
               <PhoneCall className="w-3 h-3 text-red-400" />
-              <span>Acil: 444 0 911</span>
+              <span>{t.emergencyCallShort}</span>
             </a>
             
             {/* Language Switcher */}
@@ -89,14 +89,14 @@ export default function Header({
 
         {/* Desktop Navigation Links */}
         <div className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-300">
-          <a href="#departments" className="hover:text-cyan-400 transition-colors">Poliklinikler</a>
-          <a href="#doctors" className="hover:text-cyan-400 transition-colors">Uzman Kadromuz</a>
+          <a href="#departments" className="hover:text-cyan-400 transition-colors">{t.navDepartments}</a>
+          <a href="#doctors" className="hover:text-cyan-400 transition-colors">{t.navDoctors}</a>
           <a href="#triage" className="hover:text-cyan-400 flex items-center gap-1">
             <Stethoscope className="w-3.5 h-3.5 text-emerald-400" />
-            <span>AI Semptom Kontrolü</span>
+            <span>{t.symptomChecker}</span>
           </a>
-          <a href="#checkup" className="hover:text-cyan-400 transition-colors">Check-Up & Sigorta</a>
-          <a href="#emergency" className="hover:text-cyan-400 transition-colors">Acil Servis</a>
+          <a href="#checkup" className="hover:text-cyan-400 transition-colors">{t.navCheckup}</a>
+          <a href="#emergency" className="hover:text-cyan-400 transition-colors">{t.navEmergency}</a>
         </div>
 
         {/* Action Buttons & Mobile Toggle */}
@@ -106,7 +106,7 @@ export default function Header({
             className="hidden md:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition-all"
           >
             <FileText className="w-3.5 h-3.5 text-cyan-400" />
-            <span>E-Sonuç</span>
+            <span>{t.eResultButton}</span>
           </button>
 
           <button
@@ -114,7 +114,7 @@ export default function Header({
             className="hidden md:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-xl transition-all"
           >
             <Video className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Tele-Sağlık</span>
+            <span>{t.telehealthButton}</span>
           </button>
 
           <button
@@ -122,7 +122,7 @@ export default function Header({
             className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 rounded-xl shadow-lg shadow-cyan-500/20 transition-all"
           >
             <Calendar className="w-3.5 h-3.5" />
-            <span>Randevu Al</span>
+            <span>{t.bookApptButton}</span>
           </button>
 
           {/* Mobile Menu Toggle Button */}
@@ -139,24 +139,24 @@ export default function Header({
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-slate-950 border-b border-slate-800 px-6 py-4 space-y-3 text-xs font-semibold text-slate-300 animate-fadeIn">
-          <a href="#departments" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-cyan-400">Poliklinikler</a>
-          <a href="#doctors" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-cyan-400">Uzman Hekim Kadrosu</a>
-          <a href="#triage" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-cyan-400 text-emerald-400">AI Semptom Kontrolü</a>
-          <a href="#checkup" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-cyan-400">Check-Up Paketleri & Sigorta</a>
-          <a href="#emergency" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-cyan-400 text-red-400">24/7 Acil Servis</a>
-          
+          <a href="#departments" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-cyan-400">{t.navDepartments}</a>
+          <a href="#doctors" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-cyan-400">{t.ourDoctors}</a>
+          <a href="#triage" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-cyan-400 text-emerald-400">{t.symptomChecker}</a>
+          <a href="#checkup" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-cyan-400">{t.checkupPackages}</a>
+          <a href="#emergency" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-cyan-400 text-red-400">{t.emergencyCare}</a>
+
           <div className="pt-3 border-t border-slate-800 flex gap-2">
-            <button 
+            <button
               onClick={() => { setMobileMenuOpen(false); onOpenPatientPortal(); }}
               className="w-1/2 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-center font-bold"
             >
-              E-Sonuç Sorgula
+              {t.eResultQuery}
             </button>
-            <button 
+            <button
               onClick={() => { setMobileMenuOpen(false); onOpenTelehealth(); }}
               className="w-1/2 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-center font-bold"
             >
-              Online Muayene
+              {t.onlineExam}
             </button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 export const translations = {
   tr: {
     heroTitle: "Geleceğin Sağlık Teknolojisi, İnsan Odaklı Bakım",
-    heroSubtitle: "LuminaCare Tıp Merkezi ile 45+ uluslararası sertifikalı uzman, 24/7 acil servis, AI triyaj ve ışık hızında dijital randevu deneyimi.",
+    heroSubtitle: "LuminaCare Tıp Merkezi ile deneyimli uzman hekim kadromuz, 24/7 acil servis, AI destekli triyaj ve hızlı dijital randevu deneyimi.",
     quickAppointment: "Hızlı Randevu Al",
     symptomChecker: "AI Semptom Kontrolü",
     patientPortal: "E-Sonuç / Tahlil Sorgula",
@@ -34,10 +34,45 @@ export const translations = {
     enterProtocol: "T.C. Kimlik veya Protokol Numarası Girin",
     loadSampleData: "Örnek Tahlil Verisi Yükle",
     insuranceChecker: "Anlaşmalı Özel Sigorta Sorgulama",
+    // Departments section — previously hardcoded Turkish regardless of `lang`
+    deptSectionBadge: "Mükemmeliyet Merkezlerimiz",
+    deptSectionDesc: "Son teknoloji tanı cihazları, hibrit ameliyathaneler ve deneyimli hekim kadromuzla hizmetinizdeyiz.",
+    onStaffSpecialists: "Kadrolu Uzman Hekim",
+    commonComplaints: "Sık Tedavi Edilen Şikayetler:",
+    bookFromDepartment: "Bu Poliklinikten Randevu Al",
+    // AI chat widget — previously hardcoded Turkish regardless of `lang`
+    chatWidgetLabel: "LuminaAI Asistanı",
+    chatOnlineStatus: "Çevrimiçi & Hazır",
+    chatGreeting: "Merhaba! Ben LuminaCare AI Sağlık Asistanı. Size nasıl yardımcı olabilirim?",
+    chatQuickQuestionsLabel: "Hızlı Sorular:",
+    chatInputPlaceholder: "Bir soru sorun...",
+    chatTypingIndicator: "LuminaAI yanıt yazıyor...",
+    chatDefaultReply: "Sorunuz medikal asistan ekibimize iletildi. Acil durumlar için lütfen 444 0 911 Acil Çağrı hattımızı arayınız.",
+    chatApptReply: "Hemen randevu sihirbazını başlatabilir veya uzman kadromuzdan hekim seçebilirsiniz.",
+    chatResultsReply: "Tahlil ve radyoloji sonuçlarınızı E-Sonuç portalımızdan PDF olarak indirebilirsiniz.",
+    chatInsuranceReply: "Anlaşmalı olduğumuz özel sağlık sigortalarının kapsamı poliçenize göre değişir; net teminat bilgisi için sigorta şirketinizle veya danışma bankomuzla teyit etmenizi öneririz.",
+    chatQuickQuestions: [
+      { label: "📅 Randevu Nasıl Alınır?", answer: "Yukarıdaki \"Randevu Al\" butonuna tıklayarak 4 adımda poliklinik, hekim ve saat seçebilirsiniz. İsterseniz şimdi randevu sihirbazını açabilirim.", action: "appointment" },
+      { label: "🧪 E-Sonuç Sorgulama", answer: "Laboratuvar tahlili ve MR sonuçlarınızı E-Sonuç portalımızdan sorgulayabilirsiniz.", action: "portal" },
+      { label: "🛡️ Anlaşmalı Sigortalar", answer: "Anlaşmalı özel sağlık sigortası sağlayıcılarımızı Sigorta Sorgulama bölümümüzden görebilirsiniz. Kapsam poliçenize göre değişir.", action: null },
+      { label: "🚑 Acil Servis Telefonu", answer: "24/7 Acil Servis ve Ambulans hattımız: 444 0 911 numaralı telefondan kesintisiz hizmet vermektedir.", action: null }
+    ],
+    // Header/nav — previously hardcoded Turkish regardless of `lang`
+    navDepartments: "Poliklinikler",
+    navDoctors: "Uzman Kadromuz",
+    navCheckup: "Check-Up & Sigorta",
+    navEmergency: "Acil Servis",
+    traumaService: "24/7 Travma & Ambulans Hizmeti",
+    emergencyCallShort: "Acil: 444 0 911",
+    eResultButton: "E-Sonuç",
+    telehealthButton: "Tele-Sağlık",
+    bookApptButton: "Randevu Al",
+    eResultQuery: "E-Sonuç Sorgula",
+    onlineExam: "Online Muayene",
   },
   en: {
     heroTitle: "Next-Gen Medical Excellence, Human-Centric Care",
-    heroSubtitle: "Experience world-class healthcare at LuminaCare Medical Center with 45+ board-certified specialists, 24/7 ER, AI Triage, and instant digital booking.",
+    heroSubtitle: "Experience modern healthcare at LuminaCare Medical Center with our experienced specialist team, 24/7 ER, AI-assisted triage, and fast digital booking.",
     quickAppointment: "Book Appointment",
     symptomChecker: "AI Symptom Checker",
     patientPortal: "Lab & Test Results",
@@ -70,6 +105,38 @@ export const translations = {
     enterProtocol: "Enter National ID or Protocol Code",
     loadSampleData: "Load Sample Test Report",
     insuranceChecker: "Insurance Provider Verification",
+    deptSectionBadge: "Centers of Excellence",
+    deptSectionDesc: "State-of-the-art diagnostic equipment, hybrid operating rooms, and an experienced specialist team, ready to serve you.",
+    onStaffSpecialists: "On-Staff Specialists",
+    commonComplaints: "Commonly Treated Complaints:",
+    bookFromDepartment: "Book from this Department",
+    chatWidgetLabel: "LuminaAI Assistant",
+    chatOnlineStatus: "Online & Ready",
+    chatGreeting: "Hello! I'm the LuminaCare AI Health Assistant. How can I help you today?",
+    chatQuickQuestionsLabel: "Quick Questions:",
+    chatInputPlaceholder: "Ask a question...",
+    chatTypingIndicator: "LuminaAI is typing...",
+    chatDefaultReply: "Your question has been forwarded to our medical assistant team. For emergencies, please call our ER hotline at 444 0 911.",
+    chatApptReply: "I can start the appointment wizard now, or you can pick a specialist from our roster.",
+    chatResultsReply: "You can look up your lab and imaging results as a PDF through our patient results portal.",
+    chatInsuranceReply: "Coverage from our partner insurers depends on your specific policy; please check the Insurance Verification section or confirm directly with your provider.",
+    chatQuickQuestions: [
+      { label: "📅 How do I book an appointment?", answer: "Click the \"Book Appointment\" button above to choose a department, doctor, and time in 4 steps. I can open the appointment wizard for you now if you'd like.", action: "appointment" },
+      { label: "🧪 Check lab results", answer: "You can look up your lab and MRI results through our patient results portal.", action: "portal" },
+      { label: "🛡️ Partner insurers", answer: "You can see our partner private health insurers in the Insurance Verification section. Coverage depends on your specific policy.", action: null },
+      { label: "🚑 Emergency hotline", answer: "Our 24/7 ER and ambulance hotline is 444 0 911, available around the clock.", action: null }
+    ],
+    navDepartments: "Departments",
+    navDoctors: "Our Specialists",
+    navCheckup: "Check-Up & Insurance",
+    navEmergency: "Emergency",
+    traumaService: "24/7 Trauma & Ambulance Service",
+    emergencyCallShort: "Emergency: 444 0 911",
+    eResultButton: "Results",
+    telehealthButton: "Telehealth",
+    bookApptButton: "Book Now",
+    eResultQuery: "Check Results",
+    onlineExam: "Online Consultation",
   }
 };
 
@@ -84,7 +151,9 @@ export const departmentsData = [
       en: "Advanced Coronary Angiography, Echocardiography, Arrhythmia Therapy and AI-Enhanced ECG Analytics."
     },
     specsCount: 6,
-    techBadge: "3D Carto-Mapping & Holter",
+    // Was "3D Carto-Mapping" — CARTO is a real trademarked cardiac
+    // mapping system (Biosense Webster/J&J); kept generic instead.
+    techBadge: "3D Kardiyak Haritalama & Holter",
     popularSymptom: { tr: "Göğüs ağrısı, Çarpıntı, Nefes Darlığı", en: "Chest tightness, Palpitations, Shortness of breath" }
   },
   {
@@ -123,7 +192,8 @@ export const departmentsData = [
       en: "Robotic Joint Replacement, Sports Injury Therapy, Arthroscopy, and Spine Rehabilitation."
     },
     specsCount: 4,
-    techBadge: "Mako Robotic Surgery",
+    // Was "Mako Robotic Surgery" — Mako is a real Stryker-owned brand.
+    techBadge: "Robotik Cerrahi Sistemi",
     popularSymptom: { tr: "Diz ağrısı, Omuz sıkışması, Kırık/Çıkık", en: "Knee pain, Shoulder impinement, Fractures" }
   },
   {
@@ -145,11 +215,12 @@ export const departmentsData = [
     icon: "Sparkles",
     image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&w=600&q=80",
     desc: {
-      tr: "Dijital Ben Haritalama (FotoFinder), Akne & Leke Tedavisi, Anti-Aging Medikal Estetik ve Alerji Testleri.",
-      en: "Digital Mole Mapping (FotoFinder), Acne & Hyperpigmentation, Anti-Aging Aesthetics, and Skin Allergy."
+      tr: "Dijital Ben Haritalama, Akne & Leke Tedavisi, Anti-Aging Medikal Estetik ve Alerji Testleri.",
+      en: "Digital Mole Mapping, Acne & Hyperpigmentation, Anti-Aging Aesthetics, and Skin Allergy."
     },
     specsCount: 4,
-    techBadge: "FotoFinder Dermoscopy",
+    // Was "FotoFinder Dermoscopy" — FotoFinder is a real device manufacturer.
+    techBadge: "Dijital Dermoskopi",
     popularSymptom: { tr: "Cilt döküntüsü, Kaşıntı, Akne, Ben Değişimi", en: "Skin rash, Itching, Acne, Mole changes" }
   }
 ];
@@ -166,10 +237,17 @@ export const doctorsData = [
     image: "/images/doctor_female.jpg",
     languages: ["TR", "EN", "DE"],
     telehealth: true,
-    education: { tr: "Hacettepe Üniversitesi Tıp Fakültesi / Harvard Medical School Fellow", en: "Hacettepe University MD / Harvard Medical School Fellow" },
+    // Was "Harvard Medical School Fellow" — a fabricated affiliation with a
+    // real, specific, highly verifiable institution. Removed.
+    education: { tr: "Hacettepe Üniversitesi Tıp Fakültesi", en: "Hacettepe University School of Medicine" },
     bio: {
-      tr: "Girişimsel kardiyoloji ve koroner stent uygulamalarında 15.000'den fazla başarılı vaka deneyimi. Dünya Kardiyoloji Derneği Yönetim Kurulu Üyesi.",
-      en: "Over 15,000 successful interventional cardiology cases. Member of the World Heart Federation Board."
+      // Was "15.000+ vaka" and "Dünya Kardiyoloji Derneği (World Heart
+      // Federation) Yönetim Kurulu Üyesi" — an unverifiable case count plus
+      // a claimed board seat at a real, named international organization.
+      // Replaced with a description of expertise that doesn't assert
+      // affiliation with a specific real body.
+      tr: "Girişimsel kardiyoloji ve koroner stent uygulamalarında uzun yıllara dayanan deneyime sahiptir.",
+      en: "Extensive experience in interventional cardiology and coronary stenting."
     },
     availableSlots: ["09:30", "11:00", "14:15", "16:00"]
   },
@@ -184,7 +262,9 @@ export const doctorsData = [
     image: "/images/doctor_male.jpg",
     languages: ["TR", "EN"],
     telehealth: true,
-    education: { tr: "İstanbul Üniversitesi Cerrahpaşa Tıp Fakültesi / Charité Berlin", en: "Istanbul Cerrahpasa MD / Charité Berlin Specialist" },
+    // Was "Charité Berlin" — a fabricated affiliation with a real, specific,
+    // highly verifiable institution. Removed.
+    education: { tr: "İstanbul Üniversitesi Cerrahpaşa Tıp Fakültesi", en: "Istanbul University Cerrahpaşa School of Medicine" },
     bio: {
       tr: "Migren blokajı, Parkinson pil tedavisi ve kronik baş ağrılarında nöromodülasyon teknolojisi öncüsü.",
       en: "Pioneer in neuromodulation therapy for refractory migraines, Parkinson's deep brain stimulation, and neuro-rehabilitation."
@@ -220,7 +300,9 @@ export const doctorsData = [
     image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80",
     languages: ["TR", "EN", "RU"],
     telehealth: false,
-    education: { tr: "Ankara Üniversitesi Tıp Fakültesi / Mayo Clinic USA", en: "Ankara University MD / Mayo Clinic Fellowship" },
+    // Was "Mayo Clinic USA" / "Mayo Clinic Fellowship" — a fabricated
+    // affiliation with a real, specific, highly verifiable institution. Removed.
+    education: { tr: "Ankara Üniversitesi Tıp Fakültesi", en: "Ankara University School of Medicine" },
     bio: {
       tr: "Robotik diz-kalça protezi ameliyatlarında minimal invaziv cerrahi teknikler ile 24 saatte ayağa kaldırma protokolü.",
       en: "Specialist in 24-hour fast-track rehabilitation following robotic total knee & hip replacement."
@@ -238,7 +320,9 @@ export const doctorsData = [
     image: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=400&q=80",
     languages: ["TR", "EN", "FR"],
     telehealth: true,
-    education: { tr: "Marmara Üniversitesi Tıp Fakültesi / Moorfields Eye Hospital London", en: "Marmara University MD / Moorfields Eye Hospital London" },
+    // Was "Moorfields Eye Hospital London" — a fabricated affiliation with a
+    // real, specific, highly verifiable institution. Removed.
+    education: { tr: "Marmara Üniversitesi Tıp Fakültesi", en: "Marmara University School of Medicine" },
     bio: {
       tr: "Gözlüklerden kurtulma ameliyatlarında No-Touch Lazer ve multifokal akıllı mercek uygulayıcısı.",
       en: "World-renowned specialist for No-Touch laser vision correction and premium multifocal intraocular lenses."
@@ -321,9 +405,12 @@ export const symptomsDb = [
     departmentId: "dermatology",
     urgency: "DÜŞÜK - NORMAL",
     urgencyClass: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    // Was "FotoFinder dijital analizi" / "FotoFinder mapping" — FotoFinder is
+    // a real device manufacturer; this reference was missed in the earlier
+    // FotoFinder cleanup pass (it lived in symptomsDb, not departmentsData).
     advice: {
-      tr: "Cilt lekeleri, kaşıntılı döküntüler ve ben kontrolleri için Dermatoloji polikliniğimizde FotoFinder dijital analizi yapılmaktadır.",
-      en: "For skin blemishes or mole tracking, book an appointment with Dermatology for FotoFinder mapping."
+      tr: "Cilt lekeleri, kaşıntılı döküntüler ve ben kontrolleri için Dermatoloji polikliniğimizde dijital dermoskopi ile değerlendirme yapılmaktadır.",
+      en: "For skin blemishes or mole tracking, book an appointment with Dermatology for a digital dermoscopy evaluation."
     }
   }
 ];
@@ -374,13 +461,20 @@ export const checkupPackages = [
   }
 ];
 
+// Previously listed real Turkish insurance companies (Acıbadem, Allianz, AXA,
+// Sompo, MAPFRE, Anadolu Sigorta) with fabricated specific coverage claims
+// ("100% VIP teminat" etc.) — this falsely implied real insurers have a
+// verified partnership with this demo hospital. Replaced with generic,
+// clearly-fictional provider categories, and made bilingual (this data was
+// never wired to `lang` before either — it was fixed Turkish regardless of
+// the language toggle).
 export const insuranceProviders = [
-  { name: "Acıbadem Sigorta", logo: "🛡️", coverage: "100% Ayakta & Yatarak" },
-  { name: "Allianz Sigorta", logo: "🌐", coverage: "100% Özel VIP Teminat" },
-  { name: "AXA Sigorta", logo: "💎", coverage: "100% Anlaşmalı Poliklinikler" },
-  { name: "Sompo Sigorta", logo: "⭐", coverage: "Tam Tamamlayıcı & Özel" },
-  { name: "MAPFRE Sigorta", logo: "🚀", coverage: "Kapsamlı Sağlık Teminatı" },
-  { name: "Anadolu Sigorta", logo: "🏛️", coverage: "Özel Sağlık & TSS" }
+  { name: "Özel Sağlık Sigortası A", logo: "🛡️", coverage: { tr: "Ayakta & Yatarak Tedavi", en: "Outpatient & Inpatient Care" } },
+  { name: "Özel Sağlık Sigortası B", logo: "🌐", coverage: { tr: "VIP Teminat Paketi", en: "VIP Coverage Package" } },
+  { name: "Tamamlayıcı Sağlık Sigortası A", logo: "💎", coverage: { tr: "Poliklinik Muayeneleri", en: "Outpatient Consultations" } },
+  { name: "Tamamlayıcı Sağlık Sigortası B", logo: "⭐", coverage: { tr: "Tam Tamamlayıcı & Özel", en: "Full Supplementary & Private" } },
+  { name: "Kurumsal Sağlık Sigortası A", logo: "🚀", coverage: { tr: "Kapsamlı Sağlık Teminatı", en: "Comprehensive Health Coverage" } },
+  { name: "Kurumsal Sağlık Sigortası B", logo: "🏛️", coverage: { tr: "Özel Sağlık & TSS", en: "Private Health & Supplementary" } }
 ];
 
 export const samplePatientLabResult = {

@@ -11,14 +11,56 @@ import {
 } from 'lucide-react';
 import { translations } from '../data/mockData';
 
-export default function Hero({ 
-  lang, 
-  onOpenAppointment, 
-  onOpenPatientPortal, 
+// Was hardcoded Turkish regardless of `lang` — headline badge, the quick
+// services card, and the stats bar labels never used `translations[lang]`.
+const heroText = {
+  tr: {
+    accreditationBadge: "Uluslararası Standartlarda Sağlık Hizmeti",
+    headlinePre: "Geleceğin Sağlık Teknolojisi,",
+    headlineHighlight: "İnsan Odaklı Bakım",
+    quickServicesTitle: "Hızlı Dijital Hizmetler",
+    activeBadge: "24/7 Aktif",
+    apptOptionTitle: "4 Adımda Dijital Randevu",
+    apptOptionDesc: "Poliklinik, hekim ve QR bilet seçimi",
+    telehealthOptionTitle: "Online Görüntülü Muayene",
+    telehealthOptionDesc: "Canlı görüntülü doktor görüşmesi",
+    labOptionTitle: "Laboratuvar & MR Sonuçları",
+    labOptionDesc: "Tahlil sorgulama ve PDF indir",
+    statSatisfaction: "Hasta Memnuniyet Oranı (örnek veri)",
+    statSpecialists: "Uzman Hekim Kadromuz (örnek veri)",
+    statErTime: "< 6 Dk",
+    statErTimeLabel: "Ortalama Acil Servis Kabulü",
+    statSurgery: "Robotik & Hibrit Cerrahi",
+  },
+  en: {
+    accreditationBadge: "International-Standard Healthcare Service",
+    headlinePre: "The Future of Health Technology,",
+    headlineHighlight: "Human-Centered Care",
+    quickServicesTitle: "Fast Digital Services",
+    activeBadge: "24/7 Active",
+    apptOptionTitle: "4-Step Digital Appointment",
+    apptOptionDesc: "Department, doctor, and QR ticket selection",
+    telehealthOptionTitle: "Online Video Consultation",
+    telehealthOptionDesc: "Live video call with a doctor",
+    labOptionTitle: "Lab & MRI Results",
+    labOptionDesc: "Check results and download PDF",
+    statSatisfaction: "Patient Satisfaction Rate (sample data)",
+    statSpecialists: "Specialist Physicians on Staff (sample data)",
+    statErTime: "< 6 min",
+    statErTimeLabel: "Average ER Admission Time",
+    statSurgery: "Robotic & Hybrid Surgery",
+  },
+};
+
+export default function Hero({
+  lang,
+  onOpenAppointment,
+  onOpenPatientPortal,
   onOpenTelehealth,
-  onScrollToTriage 
+  onScrollToTriage
 }) {
   const t = translations[lang];
+  const h = heroText[lang];
 
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden py-16 md:py-24 px-4 sm:px-6">
@@ -43,17 +85,19 @@ export default function Hero({
         {/* Left Column: Headline & Action Buttons */}
         <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
           
-          {/* Accreditation Badge */}
+          {/* Badge: intentionally generic — do not reference a real
+              accreditation body (e.g. JCI) here unless the specific clinic
+              this is deployed for actually holds that accreditation. */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold backdrop-blur-md">
             <Award className="w-4 h-4 text-cyan-400" />
-            <span>JCI Uluslararası Akredite Tıp Kompleksi</span>
+            <span>{h.accreditationBadge}</span>
           </div>
 
           {/* Headline (Responsive Scaling) */}
           <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-            Geleceğin Sağlık Teknolojisi, <br className="hidden sm:inline" />
+            {h.headlinePre} <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-cyan-400 via-emerald-400 to-blue-400 bg-clip-text text-transparent">
-              İnsan Odaklı Bakım
+              {h.headlineHighlight}
             </span>
           </h1>
 
@@ -91,10 +135,10 @@ export default function Hero({
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-cyan-400" />
-                <h3 className="font-extrabold text-slate-100 text-sm sm:text-base">Hızlı Dijital Hizmetler</h3>
+                <h3 className="font-extrabold text-slate-100 text-sm sm:text-base">{h.quickServicesTitle}</h3>
               </div>
               <span className="text-[10px] uppercase font-bold text-emerald-400 px-2 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/30">
-                24/7 Aktif
+                {h.activeBadge}
               </span>
             </div>
 
@@ -110,8 +154,8 @@ export default function Hero({
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">4 Adımda Dijital Randevu</h4>
-                    <p className="text-[11px] text-slate-400">Poliklinik, hekim ve QR bilet seçimi</p>
+                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">{h.apptOptionTitle}</h4>
+                    <p className="text-[11px] text-slate-400">{h.apptOptionDesc}</p>
                   </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
@@ -127,8 +171,8 @@ export default function Hero({
                     <Video className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Online Görüntülü Muayene</h4>
-                    <p className="text-[11px] text-slate-400">Canlı görüntülü doktor görüşmesi</p>
+                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">{h.telehealthOptionTitle}</h4>
+                    <p className="text-[11px] text-slate-400">{h.telehealthOptionDesc}</p>
                   </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
@@ -144,8 +188,8 @@ export default function Hero({
                     <FileCheck2 className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-blue-300 transition-colors">Laboratuvar & MR Sonuçları</h4>
-                    <p className="text-[11px] text-slate-400">Tahlil sorgulama ve PDF indir</p>
+                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-blue-300 transition-colors">{h.labOptionTitle}</h4>
+                    <p className="text-[11px] text-slate-400">{h.labOptionDesc}</p>
                   </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
@@ -158,31 +202,36 @@ export default function Hero({
 
       </div>
 
-      {/* Stats Counter Bar with Crisp Spacing */}
+      {/* Stats Counter Bar — PLACEHOLDER VALUES. These are illustrative
+          sample numbers for the demo only. Before this site goes live for
+          a real clinic, every figure here must be replaced with that
+          clinic's own real, verifiable numbers (or removed if they don't
+          have one) — presenting unverified stats as fact to real patients
+          can run into health-advertising rules, not just an honesty issue. */}
       <div className="relative z-10 max-w-7xl mx-auto w-full mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="glass-card p-4 text-center border-slate-800 rounded-xl">
           <div className="text-2xl sm:text-3xl font-extrabold text-white bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
             %99.6
           </div>
-          <div className="text-[11px] text-slate-400 mt-1 font-semibold">Hasta Memnuniyet Oranı</div>
+          <div className="text-[11px] text-slate-400 mt-1 font-semibold">{h.statSatisfaction}</div>
         </div>
         <div className="glass-card p-4 text-center border-slate-800 rounded-xl">
           <div className="text-2xl sm:text-3xl font-extrabold text-white bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
             45+
           </div>
-          <div className="text-[11px] text-slate-400 mt-1 font-semibold">Uluslararası Sertifikalı Hekim</div>
+          <div className="text-[11px] text-slate-400 mt-1 font-semibold">{h.statSpecialists}</div>
         </div>
         <div className="glass-card p-4 text-center border-slate-800 rounded-xl">
           <div className="text-2xl sm:text-3xl font-extrabold text-white bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-            &lt; 6 Dk
+            {h.statErTime}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1 font-semibold">Ortalama Acil Servis Kabulü</div>
+          <div className="text-[11px] text-slate-400 mt-1 font-semibold">{h.statErTimeLabel}</div>
         </div>
         <div className="glass-card p-4 text-center border-slate-800 rounded-xl">
           <div className="text-2xl sm:text-3xl font-extrabold text-white bg-gradient-to-r from-purple-400 to-emerald-400 bg-clip-text text-transparent">
             24/7
           </div>
-          <div className="text-[11px] text-slate-400 mt-1 font-semibold">Robotik & Hibrit Cerrahi</div>
+          <div className="text-[11px] text-slate-400 mt-1 font-semibold">{h.statSurgery}</div>
         </div>
       </div>
 
