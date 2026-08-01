@@ -36,6 +36,9 @@ const triageText = {
     matchNote: "Şikayetinize Uygun",
     yearsExp: "Yıl Deneyim",
     bookAppt: "Randevu Al",
+    noMatchTitle: "Net Bir Eşleşme Bulamadık",
+    noMatchDesc: "Yazdığınız ifadeyi bilinen şikayet listemizle eşleştiremedik. Bu, bu aracın sınırlı bir ön yönlendirme listesi kullanmasından kaynaklanıyor — bir teşhis aracı değildir. Aşağıdan tüm polikliniklerimizi inceleyebilir veya doğrudan randevu sihirbazını kullanabilirsiniz.",
+    viewAllDepts: "Tüm Poliklinikleri Gör",
   },
   en: {
     badge: "Smart Department Routing Tool",
@@ -54,6 +57,9 @@ const triageText = {
     matchNote: "Matches Your Complaint",
     yearsExp: "Years Experience",
     bookAppt: "Book Appointment",
+    noMatchTitle: "We Couldn't Find a Confident Match",
+    noMatchDesc: "We couldn't match what you wrote to our known complaint list. That's because this tool works from a limited routing list — it is not a diagnostic tool. You can browse all our departments below, or go straight to the appointment wizard.",
+    viewAllDepts: "View All Departments",
   },
 };
 
@@ -81,12 +87,20 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
     setAnalyzedResult(null);
 
     setTimeout(() => {
-      let matched = symptomsDb.find(item => 
+      const matched = symptomsDb.find(item =>
         item.keywords.some(kw => textToSearch.includes(kw))
       );
 
+      // Was silently falling back to a fixed department (symptomsDb[1]) when
+      // nothing matched, and displaying it with the same confidence as a
+      // real match. That's a real risk in a health context — an unrelated
+      // complaint could get routed to the wrong department while looking
+      // authoritative. Now an unmatched query honestly says so instead of
+      // guessing.
       if (!matched) {
-        matched = symptomsDb[1];
+        setAnalyzedResult({ noMatch: true });
+        setIsAnalyzing(false);
+        return;
       }
 
       const matchingDepartment = departmentsData.find(d => d.id === matched.departmentId);
@@ -189,10 +203,25 @@ export default function SymptomTriage({ lang, onSelectDoctorForBooking }) {
             </div>
           )}
 
+          {/* No Confident Match — honest fallback instead of guessing a department */}
+          {analyzedResult && analyzedResult.noMatch && !isAnalyzing && (
+            <div className="mt-10 p-8 md:p-10 bg-slate-950/95 rounded-2xl border border-amber-500/40 space-y-4 animate-fadeIn text-center">
+              <AlertCircle className="w-10 h-10 text-amber-400 mx-auto" />
+              <h4 className="text-xl font-bold text-white">{c.noMatchTitle}</h4>
+              <p className="text-xs text-slate-400 max-w-lg mx-auto leading-relaxed">{c.noMatchDesc}</p>
+              <a
+                href="#departments"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-bold transition-all"
+              >
+                <span>{c.viewAllDepts}</span>
+              </a>
+            </div>
+          )}
+
           {/* Analyzed Result Display */}
-          {analyzedResult && !isAnalyzing && (
+          {analyzedResult && !analyzedResult.noMatch && !isAnalyzing && (
             <div className="mt-10 p-8 md:p-10 bg-slate-950/95 rounded-2xl border border-emerald-500/40 space-y-8 animate-fadeIn">
-              
+
               {/* Urgency & Department Header */}
               <div className="flex flex-wrap items-center justify-between gap-6 pb-6 border-b border-slate-800">
                 <div>
